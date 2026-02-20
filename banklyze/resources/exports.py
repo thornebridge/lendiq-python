@@ -18,8 +18,8 @@ class ExportsResource:
     def deal_pdf(self, deal_id: int) -> bytes:
         return self._client._request("GET", f"/v1/deals/{deal_id}/export/pdf", raw=True)
 
-    def statement_csv(self, statement_id: int) -> bytes:
-        return self._client._request("GET", f"/v1/statements/{statement_id}/export/csv", raw=True)
+    def document_csv(self, document_id: int) -> bytes:
+        return self._client._request("GET", f"/v1/documents/{document_id}/export/csv", raw=True)
 
-    def statement_pdf(self, statement_id: int) -> bytes:
-        return self._client._request("GET", f"/v1/statements/{statement_id}/export/pdf", raw=True)
+    def document_pdf(self, document_id: int) -> bytes:
+        return self._client._request("GET", f"/v1/documents/{document_id}/pdf", raw=True)

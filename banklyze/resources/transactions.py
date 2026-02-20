@@ -1,4 +1,4 @@
-"""Transactions resource — list transactions by statement or deal."""
+"""Transactions resource — list transactions by document or deal."""
 
 from __future__ import annotations
 
@@ -12,16 +12,16 @@ class TransactionsResource:
     def __init__(self, client: BanklyzeClient):
         self._client = client
 
-    def list_for_statement(
+    def list_for_document(
         self,
-        statement_id: int,
+        document_id: int,
         *,
         page: int = 1,
         per_page: int = 50,
     ) -> dict[str, Any]:
         return self._client._request(
             "GET",
-            f"/v1/statements/{statement_id}/transactions",
+            f"/v1/documents/{document_id}/transactions",
             params={"page": page, "per_page": per_page},
         )
 

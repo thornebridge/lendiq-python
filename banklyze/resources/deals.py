@@ -24,7 +24,11 @@ class DealsResource:
         return self._client._request(
             "GET",
             "/v1/deals",
-            params={"status": status, "search": search, "sort": sort, "page": page, "per_page": per_page},
+            params={
+                "status": status, "search": search,
+                "sort": sort, "page": page,
+                "per_page": per_page,
+            },
         )
 
     def create(
@@ -63,7 +67,13 @@ class DealsResource:
     def delete(self, deal_id: int) -> dict[str, Any]:
         return self._client._request("DELETE", f"/v1/deals/{deal_id}")
 
-    def decision(self, deal_id: int, *, decision: str, idempotency_key: str | None = None) -> dict[str, Any]:
+    def decision(
+        self,
+        deal_id: int,
+        *,
+        decision: str,
+        idempotency_key: str | None = None,
+    ) -> dict[str, Any]:
         headers = {}
         if idempotency_key:
             headers["Idempotency-Key"] = idempotency_key
@@ -102,7 +112,12 @@ class DealsResource:
     def recommendation(self, deal_id: int) -> dict[str, Any]:
         return self._client._request("GET", f"/v1/deals/{deal_id}/recommendation")
 
-    def regenerate_summary(self, deal_id: int, *, idempotency_key: str | None = None) -> dict[str, Any]:
+    def regenerate_summary(
+        self,
+        deal_id: int,
+        *,
+        idempotency_key: str | None = None,
+    ) -> dict[str, Any]:
         headers = {}
         if idempotency_key:
             headers["Idempotency-Key"] = idempotency_key

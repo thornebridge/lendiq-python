@@ -14,8 +14,10 @@ from banklyze.exceptions import (
     ValidationError,
 )
 from banklyze.resources.deals import DealsResource
+from banklyze.resources.documents import DocumentsResource
 from banklyze.resources.exports import ExportsResource
-from banklyze.resources.statements import StatementsResource
+from banklyze.resources.ingest import IngestResource
+from banklyze.resources.rulesets import RulesetsResource
 from banklyze.resources.transactions import TransactionsResource
 from banklyze.resources.webhooks import WebhooksResource
 
@@ -51,9 +53,11 @@ class BanklyzeClient:
         )
 
         self.deals = DealsResource(self)
-        self.statements = StatementsResource(self)
+        self.documents = DocumentsResource(self)
         self.transactions = TransactionsResource(self)
         self.exports = ExportsResource(self)
+        self.ingest = IngestResource(self)
+        self.rulesets = RulesetsResource(self)
         self.webhooks = WebhooksResource(self)
 
     def __enter__(self):
