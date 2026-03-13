@@ -1,19 +1,19 @@
-"""Deals resource — CRUD, decision, notes, recommendation."""
+"""Async deals resource — CRUD, decision, notes, recommendation."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from banklyze.client import BanklyzeClient
-    from banklyze.pagination import PageIterator
+    from banklyze.async_client import AsyncBanklyzeClient
+    from banklyze.pagination import AsyncPageIterator
 
 
-class DealsResource:
-    def __init__(self, client: BanklyzeClient):
+class AsyncDealsResource:
+    def __init__(self, client: AsyncBanklyzeClient):
         self._client = client
 
-    def list(
+    async def list(
         self,
         *,
         status: str | None = None,
@@ -30,7 +30,7 @@ class DealsResource:
         date_from: str | None = None,
         date_to: str | None = None,
     ) -> dict[str, Any]:
-        return self._client._request(
+        return await self._client._request(
             "GET",
             "/v1/deals",
             params={
@@ -50,24 +50,7 @@ class DealsResource:
             },
         )
 
-    def list_all(self, **filters: Any) -> PageIterator:
-        """Iterate over all deals, auto-fetching pages.
-
-        Accepts the same keyword filters as :meth:`list` (``status``,
-        ``search``, ``sort``, ``order``, ``health_grade``, etc.).
-
-        Usage::
-
-            for deal in client.deals.list_all(status="ready"):
-                print(deal["business_name"])
-        """
-        from banklyze.pagination import PageIterator
-
-        return PageIterator(
-            self._client, "/v1/deals", data_key="deals", params=filters
-        )
-
-    def create(
+    async def create(
         self,
         *,
         business_name: str,
@@ -181,9 +164,9 @@ class DealsResource:
             if value is not None:
                 body[key] = value
 
-        return self._client._request("POST", "/v1/deals", json=body, headers=headers or None)
+        return await self._client._request("POST", "/v1/deals", json=body, headers=headers or None)
 
-    def batch_create(
+    async def batch_create(
         self,
         deals: list[dict[str, Any]],
     ) -> dict[str, Any]:
@@ -192,12 +175,12 @@ class DealsResource:
         Each element in ``deals`` must include ``business_name`` at minimum and
         may include any field accepted by :meth:`create`.
         """
-        return self._client._request("POST", "/v1/deals/batch", json=deals)
+        return await self._client._request("POST", "/v1/deals/batch", json=deals)
 
-    def get(self, deal_id: int) -> dict[str, Any]:
-        return self._client._request("GET", f"/v1/deals/{deal_id}")
+    async def get(self, deal_id: int) -> dict[str, Any]:
+        return await self._client._request("GET", f"/v1/deals/{deal_id}")
 
-    def update(
+    async def update(
         self,
         deal_id: int,
         *,
@@ -308,32 +291,32 @@ class DealsResource:
         for key, value in _all_fields.items():
             if value is not None:
                 fields[key] = value
-        return self._client._request("PATCH", f"/v1/deals/{deal_id}", json=fields)
+        return await self._client._request("PATCH", f"/v1/deals/{deal_id}", json=fields)
 
-    def delete(self, deal_id: int) -> dict[str, Any]:
-        return self._client._request("DELETE", f"/v1/deals/{deal_id}")
+    async def delete(self, deal_id: int) -> dict[str, Any]:
+        return await self._client._request("DELETE", f"/v1/deals/{deal_id}")
 
-    def stats(self) -> dict[str, Any]:
+    async def stats(self) -> dict[str, Any]:
         """Aggregate KPI stats for the dashboard (total, by-status, avg health, volume)."""
-        return self._client._request("GET", "/v1/deals/stats")
+        return await self._client._request("GET", "/v1/deals/stats")
 
-    def analytics(self) -> dict[str, Any]:
+    async def analytics(self) -> dict[str, Any]:
         """Portfolio analytics: approval rates, grade distribution, avg funding, etc."""
-        return self._client._request("GET", "/v1/deals/analytics")
+        return await self._client._request("GET", "/v1/deals/analytics")
 
-    def daily_stats(self, *, days: int = 30) -> dict[str, Any]:
+    async def daily_stats(self, *, days: int = 30) -> dict[str, Any]:
         """Daily deal volume and approval rate trends for time-series charts.
 
         Args:
-            days: Number of trailing days to return (7–90, default 30).
+            days: Number of trailing days to return (7-90, default 30).
         """
-        return self._client._request(
+        return await self._client._request(
             "GET",
             "/v1/deals/stats/daily",
             params={"days": days},
         )
 
-    def export_csv(
+    async def export_csv(
         self,
         *,
         status: str | None = None,
@@ -343,13 +326,13 @@ class DealsResource:
 
         Returns the raw CSV bytes. Write to a file or decode as needed.
         """
-        return self._client._request(
+        return await self._client._request(
             "GET",
             "/v1/deals/export/csv",
             params={"status": status, "q": q},
         )
 
-    def evaluate(
+    async def evaluate(
         self,
         deal_id: int,
         *,
@@ -371,13 +354,13 @@ class DealsResource:
             params["ruleset_id"] = ruleset_id
         if ruleset_ids is not None:
             params["ruleset_ids"] = ruleset_ids
-        return self._client._request(
+        return await self._client._request(
             "POST",
             f"/v1/deals/{deal_id}/evaluate",
             params=params or None,
         )
 
-    def decision(
+    async def decision(
         self,
         deal_id: int,
         *,
@@ -387,21 +370,21 @@ class DealsResource:
         headers = {}
         if idempotency_key:
             headers["Idempotency-Key"] = idempotency_key
-        return self._client._request(
+        return await self._client._request(
             "POST",
             f"/v1/deals/{deal_id}/decision",
             json={"decision": decision},
             headers=headers or None,
         )
 
-    def notes(self, deal_id: int, *, page: int = 1, per_page: int = 25) -> dict[str, Any]:
-        return self._client._request(
+    async def notes(self, deal_id: int, *, page: int = 1, per_page: int = 25) -> dict[str, Any]:
+        return await self._client._request(
             "GET",
             f"/v1/deals/{deal_id}/notes",
             params={"page": page, "per_page": per_page},
         )
 
-    def add_note(
+    async def add_note(
         self,
         deal_id: int,
         *,
@@ -412,17 +395,17 @@ class DealsResource:
         headers = {}
         if idempotency_key:
             headers["Idempotency-Key"] = idempotency_key
-        return self._client._request(
+        return await self._client._request(
             "POST",
             f"/v1/deals/{deal_id}/notes",
             json={"content": content, "author": author},
             headers=headers or None,
         )
 
-    def recommendation(self, deal_id: int) -> dict[str, Any]:
-        return self._client._request("GET", f"/v1/deals/{deal_id}/recommendation")
+    async def recommendation(self, deal_id: int) -> dict[str, Any]:
+        return await self._client._request("GET", f"/v1/deals/{deal_id}/recommendation")
 
-    def regenerate_summary(
+    async def regenerate_summary(
         self,
         deal_id: int,
         *,
@@ -431,8 +414,14 @@ class DealsResource:
         headers = {}
         if idempotency_key:
             headers["Idempotency-Key"] = idempotency_key
-        return self._client._request(
+        return await self._client._request(
             "POST",
             f"/v1/deals/{deal_id}/regenerate-summary",
             headers=headers or None,
         )
+
+    def list_all(self, **filters: Any) -> AsyncPageIterator:
+        """Iterate over all deals, auto-fetching pages."""
+        from banklyze.pagination import AsyncPageIterator
+
+        return AsyncPageIterator(self._client, "/v1/deals", data_key="deals", params=filters)

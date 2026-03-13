@@ -1,14 +1,22 @@
-"""BanklyzeClient — Stripe-style API client."""
+"""AsyncBanklyzeClient — async variant of the Banklyze API client."""
 
 from __future__ import annotations
 
-import random
-import time
+import asyncio
 import uuid
 from typing import Any
 
 import httpx
 
+from banklyze._base import ClientConfig
+from banklyze.async_resources.deals import AsyncDealsResource
+from banklyze.async_resources.documents import AsyncDocumentsResource
+from banklyze.async_resources.events import AsyncEventsResource
+from banklyze.async_resources.exports import AsyncExportsResource
+from banklyze.async_resources.ingest import AsyncIngestResource
+from banklyze.async_resources.rulesets import AsyncRulesetsResource
+from banklyze.async_resources.transactions import AsyncTransactionsResource
+from banklyze.async_resources.webhooks import AsyncWebhooksResource
 from banklyze.exceptions import (
     AuthenticationError,
     BanklyzeError,
@@ -16,28 +24,15 @@ from banklyze.exceptions import (
     RateLimitError,
     ValidationError,
 )
-from banklyze.resources.deals import DealsResource
-from banklyze.resources.documents import DocumentsResource
-from banklyze.resources.events import EventsResource
-from banklyze.resources.exports import ExportsResource
-from banklyze.resources.ingest import IngestResource
-from banklyze.resources.rulesets import RulesetsResource
-from banklyze.resources.transactions import TransactionsResource
-from banklyze.resources.webhooks import WebhooksResource
 
 
-class BanklyzeClient:
-    """Banklyze API client.
+class AsyncBanklyzeClient:
+    """Async Banklyze API client.
 
     Usage::
 
-        client = BanklyzeClient(api_key="bk_live_...", base_url="https://api.banklyze.com")
-        deals = client.deals.list()
-
-    Or as a context manager::
-
-        with BanklyzeClient(api_key="bk_live_...") as client:
-            deals = client.deals.list()
+        async with AsyncBanklyzeClient(api_key="bk_live_...") as client:
+            deals = await client.deals.list()
     """
 
     def __init__(
@@ -49,41 +44,45 @@ class BanklyzeClient:
         retry_backoff: float = 0.5,
         retry_max_backoff: float = 30.0,
     ):
-        headers: dict[str, str] = {}
-        if api_key:
-            headers["X-API-Key"] = api_key
-
-        self._http = httpx.Client(
-            base_url=base_url.rstrip("/"),
-            headers=headers,
+        self._config = ClientConfig(
+            api_key=api_key,
+            base_url=base_url,
+            timeout=timeout,
+            max_retries=max_retries,
+            retry_backoff=retry_backoff,
+            retry_max_backoff=retry_max_backoff,
+        )
+        self._http = httpx.AsyncClient(
+            base_url=self._config.base_url,
+            headers=self._config._build_headers(),
             timeout=timeout,
         )
-        self.last_request_id: str | None = None
-        self._max_retries = max_retries
-        self._retry_backoff = retry_backoff
-        self._retry_max_backoff = retry_max_backoff
 
-        self.deals = DealsResource(self)
-        self.documents = DocumentsResource(self)
-        self.events = EventsResource(self)
-        self.transactions = TransactionsResource(self)
-        self.exports = ExportsResource(self)
-        self.ingest = IngestResource(self)
-        self.rulesets = RulesetsResource(self)
-        self.webhooks = WebhooksResource(self)
+        self.deals = AsyncDealsResource(self)
+        self.documents = AsyncDocumentsResource(self)
+        self.events = AsyncEventsResource(self)
+        self.transactions = AsyncTransactionsResource(self)
+        self.exports = AsyncExportsResource(self)
+        self.ingest = AsyncIngestResource(self)
+        self.rulesets = AsyncRulesetsResource(self)
+        self.webhooks = AsyncWebhooksResource(self)
 
-    def __enter__(self):
+    @property
+    def last_request_id(self) -> str | None:
+        return self._config.last_request_id
+
+    async def __aenter__(self):
         return self
 
-    def __exit__(self, *args):
-        self.close()
+    async def __aexit__(self, *args):
+        await self.close()
 
-    def close(self) -> None:
-        self._http.close()
+    async def close(self) -> None:
+        await self._http.aclose()
 
     # ── Internal request helpers ─────────────────────────────────────────────
 
-    def _request(
+    async def _request(
         self,
         method: str,
         path: str,
@@ -94,7 +93,7 @@ class BanklyzeClient:
         headers: dict[str, str] | None = None,
         raw: bool = False,
     ) -> Any:
-        """Make an API request and return parsed JSON (or raw bytes if raw=True).
+        """Make an async API request and return parsed JSON (or raw bytes if raw=True).
 
         Automatically retries on transient failures with exponential backoff.
         For mutating methods (POST/PATCH/PUT), only connection-level errors are
@@ -106,11 +105,11 @@ class BanklyzeClient:
         req_headers["X-Request-ID"] = str(uuid.uuid4())
 
         last_exc: Exception | None = None
-        resp: httpx.Response | None = None
+        last_resp: httpx.Response | None = None
 
-        for attempt in range(1 + self._max_retries):
+        for attempt in range(1 + self._config.max_retries):
             try:
-                resp = self._http.request(
+                resp = await self._http.request(
                     method,
                     path,
                     json=json,
@@ -120,9 +119,10 @@ class BanklyzeClient:
                 )
 
                 # Capture the server-echoed request ID for debugging correlation
-                self.last_request_id = resp.headers.get(
+                self._config.last_request_id = resp.headers.get(
                     "X-Request-ID", req_headers["X-Request-ID"]
                 )
+                last_resp = resp
 
                 if resp.status_code < 400:
                     if raw:
@@ -132,7 +132,7 @@ class BanklyzeClient:
                     return resp.json()
 
                 # Determine if this error is retryable
-                if not self._should_retry(method, resp.status_code, attempt):
+                if not self._config._should_retry(method, resp.status_code, attempt):
                     self._raise_for_status(resp)
 
                 # For 429, honor Retry-After header
@@ -142,17 +142,17 @@ class BanklyzeClient:
                         try:
                             delay = float(retry_after)
                         except ValueError:
-                            delay = self._backoff_delay(attempt)
+                            delay = self._config._backoff_delay(attempt)
                     else:
-                        delay = self._backoff_delay(attempt)
+                        delay = self._config._backoff_delay(attempt)
                 else:
-                    delay = self._backoff_delay(attempt)
+                    delay = self._config._backoff_delay(attempt)
 
-                time.sleep(delay)
+                await asyncio.sleep(delay)
                 last_exc = BanklyzeError(
                     f"HTTP {resp.status_code}",
                     status_code=resp.status_code,
-                    request_id=self.last_request_id,
+                    request_id=self._config.last_request_id,
                 )
 
             except (
@@ -162,46 +162,22 @@ class BanklyzeClient:
                 httpx.PoolTimeout,
             ) as e:
                 # Connection-level errors are always retryable (never reached server)
-                self.last_request_id = req_headers.get("X-Request-ID")
+                self._config.last_request_id = req_headers.get("X-Request-ID")
                 last_exc = e
-                if attempt >= self._max_retries:
+                if attempt >= self._config.max_retries:
                     raise BanklyzeError(
                         f"Connection error after {attempt + 1} attempts: {e}",
-                        request_id=self.last_request_id,
+                        request_id=self._config.last_request_id,
                     ) from e
-                time.sleep(self._backoff_delay(attempt))
+                await asyncio.sleep(self._config._backoff_delay(attempt))
 
         # Exhausted retries — raise the last error
-        if resp is not None:
-            self._raise_for_status(resp)
+        if last_resp is not None:
+            self._raise_for_status(last_resp)
 
         # Fallback: should not be reached, but guard against it
         if last_exc is not None:
             raise last_exc  # type: ignore[misc]
-
-    def _should_retry(self, method: str, status_code: int, attempt: int) -> bool:
-        """Determine if a failed request should be retried."""
-        if attempt >= self._max_retries:
-            return False
-        # For mutating methods, never retry on HTTP status codes — only
-        # connection-level errors (handled in the except block) are retried.
-        if method.upper() in ("POST", "PATCH", "PUT"):
-            return False
-        # Never retry deterministic client errors
-        if status_code in (401, 403, 404, 409, 422):
-            return False
-        # Retry 429 (rate limit) and 5xx (server errors) for idempotent methods
-        if status_code == 429 or status_code >= 500:
-            return True
-        return False
-
-    def _backoff_delay(self, attempt: int) -> float:
-        """Calculate exponential backoff delay with jitter."""
-        delay = self._retry_backoff * (2 ** attempt)
-        delay = min(delay, self._retry_max_backoff)
-        # Add jitter: +/-25%
-        jitter = delay * 0.25 * (2 * random.random() - 1)
-        return max(0, delay + jitter)
 
     def _raise_for_status(self, resp: httpx.Response) -> None:
         try:
@@ -210,7 +186,7 @@ class BanklyzeClient:
             body = {}
 
         message = body.get("error") or body.get("detail") or resp.text
-        request_id = self.last_request_id
+        request_id = self._config.last_request_id
 
         if resp.status_code == 401:
             raise AuthenticationError(message, status_code=401, body=body, request_id=request_id)

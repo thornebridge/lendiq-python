@@ -6,10 +6,17 @@ from __future__ import annotations
 class BanklyzeError(Exception):
     """Base exception for all Banklyze API errors."""
 
-    def __init__(self, message: str, status_code: int | None = None, body: dict | None = None):
+    def __init__(
+        self,
+        message: str,
+        status_code: int | None = None,
+        body: dict | None = None,
+        request_id: str | None = None,
+    ):
         super().__init__(message)
         self.status_code = status_code
         self.body = body or {}
+        self.request_id = request_id
 
 
 class AuthenticationError(BanklyzeError):
@@ -29,7 +36,7 @@ class RateLimitError(BanklyzeError):
 
     def __init__(self, message: str, retry_after: int = 60, **kwargs):
         super().__init__(message, **kwargs)
-        self.retry_after = retry_after
+        self.retry_after: int = retry_after
 
 
 class InvalidSignatureError(BanklyzeError):

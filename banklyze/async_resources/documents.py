@@ -1,4 +1,4 @@
-"""Documents resource — upload, bulk upload, list, detail, status, reprocess, cancel."""
+"""Async documents resource — upload, bulk upload, list, detail, status, reprocess, cancel."""
 
 from __future__ import annotations
 
@@ -6,15 +6,15 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from banklyze.client import BanklyzeClient
-    from banklyze.pagination import PageIterator
+    from banklyze.async_client import AsyncBanklyzeClient
+    from banklyze.pagination import AsyncPageIterator
 
 
-class DocumentsResource:
-    def __init__(self, client: BanklyzeClient):
+class AsyncDocumentsResource:
+    def __init__(self, client: AsyncBanklyzeClient):
         self._client = client
 
-    def upload(
+    async def upload(
         self,
         deal_id: int,
         file_path: str | Path,
@@ -30,7 +30,7 @@ class DocumentsResource:
         if document_type:
             params["document_type"] = document_type
         with open(p, "rb") as f:
-            return self._client._request(
+            return await self._client._request(
                 "POST",
                 f"/v1/deals/{deal_id}/documents",
                 files={"file": (p.name, f, "application/pdf")},
@@ -38,7 +38,7 @@ class DocumentsResource:
                 headers=headers or None,
             )
 
-    def upload_bulk(
+    async def upload_bulk(
         self,
         deal_id: int,
         file_paths: list[str | Path],
@@ -60,7 +60,7 @@ class DocumentsResource:
                 f = open(p, "rb")
                 handles.append(f)
                 files.append(("files", (p.name, f, "application/pdf")))
-            return self._client._request(
+            return await self._client._request(
                 "POST",
                 f"/v1/deals/{deal_id}/documents/bulk",
                 files=files,
@@ -71,57 +71,44 @@ class DocumentsResource:
             for f in handles:
                 f.close()
 
-    def list(self, deal_id: int, *, page: int = 1, per_page: int = 25) -> dict[str, Any]:
-        return self._client._request(
+    async def list(self, deal_id: int, *, page: int = 1, per_page: int = 25) -> dict[str, Any]:
+        return await self._client._request(
             "GET",
             f"/v1/deals/{deal_id}/documents",
             params={"page": page, "per_page": per_page},
         )
 
-    def list_all(self, deal_id: int, **filters: Any) -> PageIterator:
-        """Iterate over all documents for a deal, auto-fetching pages.
+    async def get(self, document_id: int) -> dict[str, Any]:
+        return await self._client._request("GET", f"/v1/documents/{document_id}")
 
-        Usage::
+    async def status(self, document_id: int) -> dict[str, Any]:
+        return await self._client._request("GET", f"/v1/documents/{document_id}/status")
 
-            for doc in client.documents.list_all(deal_id=42):
-                print(doc["id"], doc["document_type"])
-        """
-        from banklyze.pagination import PageIterator
-
-        return PageIterator(
-            self._client,
-            f"/v1/deals/{deal_id}/documents",
-            data_key="documents",
-            params=filters,
-        )
-
-    def get(self, document_id: int) -> dict[str, Any]:
-        return self._client._request("GET", f"/v1/documents/{document_id}")
-
-    def status(self, document_id: int) -> dict[str, Any]:
-        return self._client._request("GET", f"/v1/documents/{document_id}/status")
-
-    def reprocess(self, document_id: int, *, idempotency_key: str | None = None) -> dict[str, Any]:
+    async def reprocess(
+        self, document_id: int, *, idempotency_key: str | None = None,
+    ) -> dict[str, Any]:
         headers = {}
         if idempotency_key:
             headers["Idempotency-Key"] = idempotency_key
-        return self._client._request(
+        return await self._client._request(
             "POST",
             f"/v1/documents/{document_id}/reprocess",
             headers=headers or None,
         )
 
-    def cancel(self, document_id: int, *, idempotency_key: str | None = None) -> dict[str, Any]:
+    async def cancel(
+        self, document_id: int, *, idempotency_key: str | None = None,
+    ) -> dict[str, Any]:
         headers = {}
         if idempotency_key:
             headers["Idempotency-Key"] = idempotency_key
-        return self._client._request(
+        return await self._client._request(
             "POST",
             f"/v1/documents/{document_id}/cancel",
             headers=headers or None,
         )
 
-    def reclassify(
+    async def reclassify(
         self,
         document_id: int,
         document_type: str,
@@ -131,9 +118,17 @@ class DocumentsResource:
         headers = {}
         if idempotency_key:
             headers["Idempotency-Key"] = idempotency_key
-        return self._client._request(
+        return await self._client._request(
             "POST",
             f"/v1/documents/{document_id}/reclassify",
             params={"document_type": document_type},
             headers=headers or None,
+        )
+
+    def list_all(self, deal_id: int, **filters: Any) -> AsyncPageIterator:
+        """Iterate over all documents for a deal, auto-fetching pages."""
+        from banklyze.pagination import AsyncPageIterator
+
+        return AsyncPageIterator(
+            self._client, f"/v1/deals/{deal_id}/documents", data_key="documents", params=filters,
         )

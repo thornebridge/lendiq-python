@@ -34,3 +34,24 @@ class WebhooksResource:
 
     def test(self) -> dict[str, Any]:
         return self._client._request("POST", "/v1/webhooks/test")
+
+    def list_deliveries(
+        self,
+        *,
+        page: int = 1,
+        per_page: int = 25,
+        event_type: str | None = None,
+        success: bool | None = None,
+    ) -> dict[str, Any]:
+        params: dict[str, Any] = {"page": page, "per_page": per_page}
+        if event_type is not None:
+            params["event_type"] = event_type
+        if success is not None:
+            params["success"] = str(success).lower()
+        return self._client._request("GET", "/v1/webhooks/deliveries", params=params)
+
+    def get_delivery(self, delivery_id: int) -> dict[str, Any]:
+        return self._client._request("GET", f"/v1/webhooks/deliveries/{delivery_id}")
+
+    def retry_delivery(self, delivery_id: int) -> dict[str, Any]:
+        return self._client._request("POST", f"/v1/webhooks/deliveries/{delivery_id}/retry")
