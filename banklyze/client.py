@@ -40,6 +40,12 @@ class BanklyzeClient:
             deals = client.deals.list()
     """
 
+    # Per-operation timeout defaults (seconds)
+    TIMEOUT_READ = 10.0
+    TIMEOUT_WRITE = 30.0
+    TIMEOUT_UPLOAD = 120.0
+    TIMEOUT_REPORT = 300.0
+
     def __init__(
         self,
         api_key: str | None = None,
@@ -48,11 +54,13 @@ class BanklyzeClient:
         max_retries: int = 2,
         retry_backoff: float = 0.5,
         retry_max_backoff: float = 30.0,
+        logger: Any | None = None,
     ):
         headers: dict[str, str] = {}
         if api_key:
             headers["X-API-Key"] = api_key
 
+        self._default_timeout = timeout
         self._http = httpx.Client(
             base_url=base_url.rstrip("/"),
             headers=headers,
@@ -62,6 +70,7 @@ class BanklyzeClient:
         self._max_retries = max_retries
         self._retry_backoff = retry_backoff
         self._retry_max_backoff = retry_max_backoff
+        self._logger = logger
 
         self.deals = DealsResource(self)
         self.documents = DocumentsResource(self)
@@ -93,6 +102,7 @@ class BanklyzeClient:
         files: Any = None,
         headers: dict[str, str] | None = None,
         raw: bool = False,
+        timeout: float | None = None,
     ) -> Any:
         """Make an API request and return parsed JSON (or raw bytes if raw=True).
 
@@ -109,6 +119,7 @@ class BanklyzeClient:
         resp: httpx.Response | None = None
 
         for attempt in range(1 + self._max_retries):
+            req_start = time.monotonic()
             try:
                 resp = self._http.request(
                     method,
@@ -117,12 +128,21 @@ class BanklyzeClient:
                     params={k: v for k, v in (params or {}).items() if v is not None},
                     files=files,
                     headers=req_headers,
+                    timeout=timeout or self._default_timeout,
                 )
 
                 # Capture the server-echoed request ID for debugging correlation
                 self.last_request_id = resp.headers.get(
                     "X-Request-ID", req_headers["X-Request-ID"]
                 )
+
+                if self._logger:
+                    duration_ms = (time.monotonic() - req_start) * 1000
+                    self._logger.debug(
+                        "%s %s -> %d (%.0fms) [%s]",
+                        method, path, resp.status_code, duration_ms,
+                        self.last_request_id,
+                    )
 
                 if resp.status_code < 400:
                     if raw:

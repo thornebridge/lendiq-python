@@ -36,6 +36,7 @@ class DocumentsResource:
                 files={"file": (p.name, f, "application/pdf")},
                 params=params or None,
                 headers=headers or None,
+                timeout=self._client.TIMEOUT_UPLOAD,
             )
 
     def upload_bulk(
@@ -66,6 +67,7 @@ class DocumentsResource:
                 files=files,
                 params=params or None,
                 headers=headers or None,
+                timeout=self._client.TIMEOUT_UPLOAD,
             )
         finally:
             for f in handles:
