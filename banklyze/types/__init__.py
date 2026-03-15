@@ -17,6 +17,16 @@ from banklyze.types.admin import (
     UsageSummaryTotals,
 )
 from banklyze.types.auth import AuthLoginResponse
+from banklyze.types.bvl import (
+    BVLHardGate,
+    BVLResult,
+    BVLRun,
+    BVLRunListResponse,
+    BVLSignal,
+    BVLStats,
+    CallQueueLead,
+    CallQueueResponse,
+)
 from banklyze.types.collaboration import (
     ActivityEvent,
     AssignedDealItem,
@@ -140,6 +150,15 @@ __all__ = [
     "UsageSummaryTotals",
     # Auth
     "AuthLoginResponse",
+    # BVL
+    "BVLHardGate",
+    "BVLResult",
+    "BVLRun",
+    "BVLRunListResponse",
+    "BVLSignal",
+    "BVLStats",
+    "CallQueueLead",
+    "CallQueueResponse",
     # Collaboration
     "ActivityEvent",
     "AssignedDealItem",

@@ -17,6 +17,7 @@ from banklyze.exceptions import (
     ValidationError,
 )
 from banklyze.resources.admin import AdminResource
+from banklyze.resources.bvl import BVLResource
 from banklyze.resources.collaboration import (
     AssignmentsResource,
     CommentsResource,
@@ -90,6 +91,7 @@ class BanklyzeClient:
         self._logger = logger
 
         self.admin = AdminResource(self)
+        self.bvl = BVLResource(self)
         self.crm = CrmResource(self)
         self.deals = DealsResource(self)
         self.documents = DocumentsResource(self)

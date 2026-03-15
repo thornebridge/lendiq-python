@@ -1,6 +1,7 @@
 """Banklyze API resource modules."""
 
 from banklyze.resources.admin import AdminResource, AsyncAdminResource
+from banklyze.resources.bvl import AsyncBVLResource, BVLResource
 from banklyze.resources.collaboration import (
     AssignmentsResource,
     AsyncAssignmentsResource,
@@ -36,6 +37,9 @@ __all__ = [
     # Admin
     "AdminResource",
     "AsyncAdminResource",
+    # BVL
+    "AsyncBVLResource",
+    "BVLResource",
     # Collaboration
     "AssignmentsResource",
     "AsyncAssignmentsResource",
