@@ -8,7 +8,13 @@ from pydantic import BaseModel
 
 
 class Recommendation(BaseModel):
-    """Full underwriting recommendation for a deal."""
+    """Full underwriting recommendation for a deal.
+
+    For declined deals, ``hypothetical_cfcr`` and ``hypothetical_dscr`` contain
+    the projected ratios if the advance *were* funded — useful for
+    near-miss analysis.  ``mca_credit_score`` is the Layer 1 composite score
+    derived solely from bank statement data.
+    """
 
     id: int
     deal_id: int
@@ -40,6 +46,9 @@ class Recommendation(BaseModel):
     forecast: dict | None = None
     cash_flow_coverage_ratio: float | None = None
     dscr: float | None = None
+    hypothetical_cfcr: float | None = None
+    hypothetical_dscr: float | None = None
+    mca_credit_score: float | None = None
     ruleset_id: int | None = None
     ruleset_name: str | None = None
     created_at: datetime | None = None

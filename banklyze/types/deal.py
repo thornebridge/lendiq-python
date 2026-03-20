@@ -82,6 +82,17 @@ class LargeDeposit(BaseModel):
 
 
 class HealthSummary(BaseModel):
+    """Health score summary with sub-factor breakdown.
+
+    The ``factors`` dict contains up to 12 sub-factors, each with ``score``,
+    ``max``, ``weight``, and ``detail`` keys.  Seven core sub-factors are always
+    present (revenue, adb_stability, nsf_cleanliness, negative_days,
+    deposit_consistency, screening_flags, deposit_quality).  Five optional
+    sub-factors (revenue_trend, stacking, volatility, debt_service, eom_trend)
+    appear when pipeline data is available.  Weights are normalized over the
+    sub-factors present so the score is always 0–100.
+    """
+
     health_score: float | None = None
     health_grade: str | None = None
     factors: dict | None = None
@@ -162,6 +173,12 @@ class SourceSummary(BaseModel):
 
 
 class McaSummary(BaseModel):
+    """MCA position and cash-flow analysis.
+
+    ``mca_credit_score`` is the Layer 1 composite score derived solely from bank
+    statement data.  It is **not** a bureau credit score.
+    """
+
     positions_detected: int | None = None
     total_daily_obligation: float | None = None
     est_remaining_balance: float | None = None
@@ -171,6 +188,8 @@ class McaSummary(BaseModel):
     propping_risk: float | None = None
     avg_daily_deposit: float | None = None
     deposit_days_pct: float | None = None
+    mca_credit_score: float | None = None
+    credit_grade: str | None = None
 
     model_config = {"extra": "allow"}
 
