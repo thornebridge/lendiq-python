@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-03-21
+
+### Added
+
+- **PrescreenSummary** — typed model for `DocumentDetail.prescreen` (was `dict | None`)
+- **DocumentIntegrity** — typed model for `DocumentDetail.integrity` (was `dict | None`)
+- **ExtractionConfidenceDetail** + **FieldConfidence** — typed model for `DocumentDetail.extraction_confidence_detail`
+- **ValidationDiscrepancy** — typed model for `AnalysisSummary.validation_discrepancies` (was `list | None`)
+- **HealthFactor** — typed model for `HealthSummary.factors` and `AnalysisSummary.health_factors_json` (was `dict | None`)
+- **RecommendationSummary** — added `dscr`, `cash_flow_coverage_ratio`, `hypothetical_cfcr`, `hypothetical_dscr`, `stress_test_passed` fields
+
+### Deprecated
+
+- `AdminResource.get_constraints()` and `update_constraints()` now emit `DeprecationWarning`; use `client.rulesets` instead
+
+### Fixed
+
+- Version mismatch between `pyproject.toml` (1.1.0) and `__version__.py` (1.0.0) — both now 1.2.0
+
 ## [1.1.0] - 2026-03-20
 
 ### Added

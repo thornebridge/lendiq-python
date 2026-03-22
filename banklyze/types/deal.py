@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from banklyze.types.common import PaginationMeta
+from banklyze.types.common import HealthFactor, PaginationMeta
 
 
 # ── Summary sub-schemas ────────────────────────────────────────────────────
@@ -95,7 +95,7 @@ class HealthSummary(BaseModel):
 
     health_score: float | None = None
     health_grade: str | None = None
-    factors: dict | None = None
+    factors: dict[str, HealthFactor] | None = None
 
     model_config = {"extra": "allow"}
 
@@ -116,6 +116,11 @@ class RecommendationSummary(BaseModel):
     funding_likelihood: str | None = None
     risk_factors: list[str] | None = None
     strengths: list[str] | None = None
+    dscr: float | None = None
+    cash_flow_coverage_ratio: float | None = None
+    hypothetical_cfcr: float | None = None
+    hypothetical_dscr: float | None = None
+    stress_test_passed: bool | None = None
 
     model_config = {"extra": "allow"}
 

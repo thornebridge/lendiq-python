@@ -7,6 +7,7 @@ define response_model schemas for them. Typed models are used where available.
 
 from __future__ import annotations
 
+import warnings
 from typing import Any
 
 from banklyze._base_resource import AsyncAPIResource, SyncAPIResource
@@ -78,6 +79,11 @@ class AdminResource(SyncAPIResource):
         .. deprecated::
             Use the rulesets resource instead.
         """
+        warnings.warn(
+            "get_constraints() is deprecated; use client.rulesets.list() instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return self._request("GET", "/v1/admin/constraints")
 
     def update_constraints(self, **kwargs: Any) -> dict[str, Any]:
@@ -99,6 +105,11 @@ class AdminResource(SyncAPIResource):
             approve_min_score: Minimum score for auto-approve.
             conditional_min_score: Minimum score for conditional approval.
         """
+        warnings.warn(
+            "update_constraints() is deprecated; use the client.rulesets resource instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return self._request("PUT", "/v1/admin/constraints", json=kwargs)
 
     def dlq_list(
@@ -190,6 +201,11 @@ class AsyncAdminResource(AsyncAPIResource):
         .. deprecated::
             Use the rulesets resource instead.
         """
+        warnings.warn(
+            "get_constraints() is deprecated; use client.rulesets.list() instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return await self._request("GET", "/v1/admin/constraints")
 
     async def update_constraints(self, **kwargs: Any) -> dict[str, Any]:
@@ -211,6 +227,11 @@ class AsyncAdminResource(AsyncAPIResource):
             approve_min_score: Minimum score for auto-approve.
             conditional_min_score: Minimum score for conditional approval.
         """
+        warnings.warn(
+            "update_constraints() is deprecated; use the client.rulesets resource instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return await self._request("PUT", "/v1/admin/constraints", json=kwargs)
 
     async def dlq_list(

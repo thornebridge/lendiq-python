@@ -41,7 +41,7 @@ from banklyze.types.collaboration import (
     UserSearchResponse,
     UserSearchResult,
 )
-from banklyze.types.common import ActionResponse, ErrorDetail, PaginationMeta
+from banklyze.types.common import ActionResponse, ErrorDetail, HealthFactor, PaginationMeta, ValidationDiscrepancy
 from banklyze.types.deal import (
     BusinessSummary,
     CoverageSummary,
@@ -76,10 +76,14 @@ from banklyze.types.document import (
     BulkUploadItemResponse,
     BulkUploadResponse,
     DocumentDetail,
+    DocumentIntegrity,
     DocumentListResponse,
     DocumentStatusResponse,
     DocumentSummary,
     DocumentUploadResponse,
+    ExtractionConfidenceDetail,
+    FieldConfidence,
+    PrescreenSummary,
 )
 from banklyze.types.event import SSEEvent
 from banklyze.types.integration import (
@@ -175,7 +179,9 @@ __all__ = [
     # Common
     "ActionResponse",
     "ErrorDetail",
+    "HealthFactor",
     "PaginationMeta",
+    "ValidationDiscrepancy",
     # Deal
     "BusinessSummary",
     "CoverageSummary",
@@ -212,10 +218,14 @@ __all__ = [
     "BulkUploadItemResponse",
     "BulkUploadResponse",
     "DocumentDetail",
+    "DocumentIntegrity",
     "DocumentListResponse",
     "DocumentStatusResponse",
     "DocumentSummary",
     "DocumentUploadResponse",
+    "ExtractionConfidenceDetail",
+    "FieldConfidence",
+    "PrescreenSummary",
     # Event
     "SSEEvent",
     # Integration

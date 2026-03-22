@@ -79,6 +79,46 @@ detail = client.deals.get(42)
 
 All response models accept unknown fields (`extra="allow"`), so new API fields won't break your code.
 
+## Document & Deal Detail
+
+Access typed sub-objects for prescreen, integrity, validation, and health factors:
+
+```python
+# Document detail with typed prescreen and integrity
+doc = client.documents.get(15)
+
+# Prescreen (regex-based extraction, no LLM cost)
+if doc.prescreen:
+    print(doc.prescreen.bank_name, doc.prescreen.viable)
+    print(f"Quality: {doc.prescreen.text_quality}, Confidence: {doc.prescreen.confidence}")
+
+# Integrity (tampering detection)
+if doc.integrity:
+    print(doc.integrity.tampering_risk_level)  # "clean" | "low" | "medium" | "high"
+    print(doc.integrity.tampering_flags)
+
+# Extraction validation
+if doc.analysis and doc.analysis.validation_is_reliable is not None:
+    print(f"Reliable: {doc.analysis.validation_is_reliable}")
+    for d in doc.analysis.validation_discrepancies or []:
+        print(f"  [{d.severity}] {d.check_type}: {d.detail}")
+
+# Health sub-factors (up to 12)
+detail = client.deals.get(42)
+if detail.health.factors:
+    for name, factor in detail.health.factors.items():
+        print(f"  {name}: {factor.score}/{factor.max} (weight {factor.weight})")
+
+# MCA credit score
+if detail.mca:
+    print(f"MCA Score: {detail.mca.mca_credit_score} ({detail.mca.credit_grade})")
+
+# Recommendation ratios (populated even on declined deals)
+if detail.recommendation:
+    print(f"CFCR: {detail.recommendation.cash_flow_coverage_ratio}")
+    print(f"DSCR: {detail.recommendation.dscr}")
+```
+
 ## Auto-Pagination
 
 Iterate over all items across pages automatically:

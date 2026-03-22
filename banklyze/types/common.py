@@ -33,3 +33,26 @@ class ErrorDetail(BaseModel):
     code: str | None = None
 
     model_config = {"extra": "allow"}
+
+
+class HealthFactor(BaseModel):
+    """Single health score sub-factor breakdown."""
+
+    score: float
+    max: float
+    weight: float
+    detail: str | None = None
+
+    model_config = {"extra": "allow"}
+
+
+class ValidationDiscrepancy(BaseModel):
+    """Extraction validation discrepancy."""
+
+    check_type: str
+    severity: str
+    detail: str
+    expected: str | None = None
+    actual: str | None = None
+
+    model_config = {"extra": "allow"}
