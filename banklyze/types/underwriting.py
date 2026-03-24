@@ -49,6 +49,8 @@ class Recommendation(BaseModel):
     hypothetical_cfcr: float | None = None
     hypothetical_dscr: float | None = None
     mca_credit_score: float | None = None
+    fundability_score: float | None = None
+    fundability_grade: str | None = None
     ruleset_id: int | None = None
     ruleset_name: str | None = None
     created_at: datetime | None = None

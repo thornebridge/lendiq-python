@@ -194,6 +194,8 @@ class McaSummary(BaseModel):
     avg_daily_deposit: float | None = None
     deposit_days_pct: float | None = None
     mca_credit_score: float | None = None
+    fundability_score: float | None = None
+    fundability_grade: str | None = None
     credit_grade: str | None = None
 
     model_config = {"extra": "allow"}
