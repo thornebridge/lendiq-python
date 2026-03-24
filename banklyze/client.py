@@ -37,6 +37,7 @@ from banklyze.resources.notifications import NotificationsResource
 from banklyze.resources.oauth import OAuthResource
 from banklyze.resources.onboarding import OnboardingResource
 from banklyze.resources.push import PushResource
+from banklyze.resources.reviews import ReviewsResource
 from banklyze.resources.rulesets import RulesetsResource
 from banklyze.resources.sam_profiles import SAMProfilesResource
 from banklyze.resources.share import SharesResource
@@ -106,6 +107,7 @@ class BanklyzeClient:
         self.oauth = OAuthResource(self)
         self.onboarding = OnboardingResource(self)
         self.push = PushResource(self)
+        self.reviews = ReviewsResource(self)
         self.rulesets = RulesetsResource(self)
         self.sam_profiles = SAMProfilesResource(self)
         self.shares = SharesResource(self)

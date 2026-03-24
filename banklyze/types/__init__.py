@@ -109,6 +109,13 @@ from banklyze.types.notification import (
     NotificationPreference,
     UnreadCountResponse,
 )
+from banklyze.types.reviews import (
+    ReviewActionResponse,
+    ReviewDetailResponse,
+    ReviewListItem,
+    ReviewListResponse,
+    TransactionReviewItem,
+)
 from banklyze.types.ruleset import (
     ComparativeEvaluationResponse,
     Ruleset,
@@ -258,6 +265,12 @@ __all__ = [
     "NotificationListResponse",
     "NotificationPreference",
     "UnreadCountResponse",
+    # Review
+    "ReviewActionResponse",
+    "ReviewDetailResponse",
+    "ReviewListItem",
+    "ReviewListResponse",
+    "TransactionReviewItem",
     # Ruleset
     "ComparativeEvaluationResponse",
     "Ruleset",
