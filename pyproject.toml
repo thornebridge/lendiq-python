@@ -36,8 +36,8 @@ dev = [
 [project.urls]
 Homepage = "https://banklyze.com"
 Documentation = "https://docs.banklyze.com/sdk/python"
-Repository = "https://github.com/thornebridge/banklyze"
-Changelog = "https://docs.banklyze.com/sdk/python/changelog"
+Repository = "https://github.com/thornebridge/banklyze-python"
+Changelog = "https://github.com/thornebridge/banklyze-python/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["banklyze"]
