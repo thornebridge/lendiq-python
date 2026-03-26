@@ -124,9 +124,9 @@ if detail.recommendation:
 Iterate over all items across pages automatically:
 
 ```python
-# list_all() yields raw dicts (not typed models) for streaming efficiency
+# list_all() yields typed Pydantic models with auto-pagination
 for deal in client.deals.list_all(status="ready"):
-    print(deal["business_name"])
+    print(deal.business_name)  # DealSummary — full IDE autocompletion
 ```
 
 ## Resources
@@ -156,6 +156,10 @@ for deal in client.deals.list_all(status="ready"):
 | CRM | `client.crm` | CRM config, sync, field mapping |
 | Push | `client.push` | Push notification subscriptions |
 | OAuth | `client.oauth` | Client credentials token exchange |
+| BVL | `client.bvl` | Business validation runs, call queue, SAM entities |
+| SAM Profiles | `client.sam_profiles` | SAM.gov search profiles, watchers, triggers |
+| Reviews | `client.reviews` | Document review queue, approve/correct |
+| Instant | `client.instant` | Free-tier instant PDF analysis (no auth) |
 
 ## Idempotency
 

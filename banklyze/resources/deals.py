@@ -13,6 +13,7 @@ from banklyze._base_resource import AsyncAPIResource, SyncAPIResource
 from banklyze.types.common import ActionResponse
 from banklyze.types.deal import (
     DailyStatsResponse,
+    DealAnalyticsResponse,
     DealDetail,
     DealListResponse,
     DealNotesListResponse,
@@ -72,7 +73,7 @@ class DealsResource(SyncAPIResource):
         )
         return DealListResponse.model_validate(data)
 
-    def list_all(self, **filters: Any) -> PageIterator:
+    def list_all(self, **filters: Any) -> PageIterator[DealSummary]:
         """Iterate over all deals, auto-fetching pages.
 
         Accepts the same keyword filters as :meth:`list` (``status``,
@@ -81,12 +82,12 @@ class DealsResource(SyncAPIResource):
         Usage::
 
             for deal in client.deals.list_all(status="ready"):
-                print(deal["business_name"])
+                print(deal.business_name)
         """
         from banklyze.pagination import PageIterator
 
         return PageIterator(
-            self._client, "/v1/deals", params=filters
+            self._client, "/v1/deals", model=DealSummary, params=filters
         )
 
     # ── Create ───────────────────────────────────────────────────────────
@@ -351,9 +352,10 @@ class DealsResource(SyncAPIResource):
         data = self._request("GET", "/v1/deals/stats")
         return DealStats.model_validate(data)
 
-    def analytics(self) -> dict[str, Any]:
+    def analytics(self) -> DealAnalyticsResponse:
         """Portfolio analytics: approval rates, grade distribution, avg funding, etc."""
-        return self._request("GET", "/v1/deals/analytics")
+        data = self._request("GET", "/v1/deals/analytics")
+        return DealAnalyticsResponse.model_validate(data)
 
     def daily_stats(self, *, days: int = 30) -> DailyStatsResponse:
         """Daily deal volume and approval rate trends for time-series charts.
@@ -573,11 +575,11 @@ class AsyncDealsResource(AsyncAPIResource):
         )
         return DealListResponse.model_validate(data)
 
-    def list_all(self, **filters: Any) -> AsyncPageIterator:
+    def list_all(self, **filters: Any) -> AsyncPageIterator[DealSummary]:
         """Iterate over all deals, auto-fetching pages."""
         from banklyze.pagination import AsyncPageIterator
 
-        return AsyncPageIterator(self._client, "/v1/deals", params=filters)
+        return AsyncPageIterator(self._client, "/v1/deals", model=DealSummary, params=filters)
 
     # ── Create ───────────────────────────────────────────────────────────
 
@@ -841,9 +843,10 @@ class AsyncDealsResource(AsyncAPIResource):
         data = await self._request("GET", "/v1/deals/stats")
         return DealStats.model_validate(data)
 
-    async def analytics(self) -> dict[str, Any]:
+    async def analytics(self) -> DealAnalyticsResponse:
         """Portfolio analytics: approval rates, grade distribution, avg funding, etc."""
-        return await self._request("GET", "/v1/deals/analytics")
+        data = await self._request("GET", "/v1/deals/analytics")
+        return DealAnalyticsResponse.model_validate(data)
 
     async def daily_stats(self, *, days: int = 30) -> DailyStatsResponse:
         """Daily deal volume and approval rate trends for time-series charts.

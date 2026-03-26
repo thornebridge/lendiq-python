@@ -134,3 +134,17 @@ class UsageModelsResponse(BaseModel):
     models: list[UsageModelsEntry]
 
     model_config = {"extra": "allow"}
+
+
+# ── Health types ────────────────────────────────────────────────────────────
+
+
+class HealthResponse(BaseModel):
+    """System health status."""
+
+    db_connected: bool
+    pipeline_success_rate_24h: float
+    pipelines_last_24h: int
+    queue_depth: int
+
+    model_config = {"extra": "allow"}

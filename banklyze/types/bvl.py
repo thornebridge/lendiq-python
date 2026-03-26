@@ -130,3 +130,42 @@ class BVLStats(BaseModel):
     top_disqualification_reasons: list[str] = []
 
     model_config = {"extra": "allow"}
+
+
+# ── SAM entity types ────────────────────────────────────────────────────────
+
+
+class SAMEntity(BaseModel):
+    """SAM.gov entity record."""
+
+    id: int
+    uei: str | None = None
+    legal_business_name: str | None = None
+    dba_name: str | None = None
+    cage_code: str | None = None
+    entity_status: str | None = None
+    physical_address_city: str | None = None
+    physical_address_state: str | None = None
+    naics_codes: list[str] = []
+    created_at: datetime | None = None
+
+    model_config = {"extra": "allow"}
+
+
+class SAMEntityListResponse(BaseModel):
+    """Paginated list of SAM entities."""
+
+    data: list[SAMEntity]
+    meta: PaginationMeta
+
+    model_config = {"extra": "allow"}
+
+
+class SAMStatsResponse(BaseModel):
+    """SAM entity fetch statistics."""
+
+    total_entities: int = 0
+    total_runs: int = 0
+    by_status: dict[str, int] = {}
+
+    model_config = {"extra": "allow"}

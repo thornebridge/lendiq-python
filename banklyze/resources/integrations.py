@@ -10,7 +10,7 @@ from typing import Any
 
 from banklyze._base_resource import AsyncAPIResource, SyncAPIResource
 from banklyze.types.common import ActionResponse
-from banklyze.types.integration import Integration, IntegrationHealthResponse
+from banklyze.types.integration import Integration, IntegrationHealthResponse, IntegrationTestResponse
 
 
 # ── Sync resource ────────────────────────────────────────────────────────────
@@ -68,16 +68,14 @@ class IntegrationsResource(SyncAPIResource):
         data = self._request("DELETE", f"/v1/integrations/{integration_type}")
         return ActionResponse.model_validate(data)
 
-    def test(self, integration_type: str) -> dict[str, Any]:
+    def test(self, integration_type: str) -> IntegrationTestResponse:
         """Send a test notification through the specified integration.
 
         Args:
             integration_type: The integration type to test.
-
-        Returns:
-            Dict with ``success`` (bool) and ``message`` (str).
         """
-        return self._request("POST", f"/v1/integrations/{integration_type}/test")
+        data = self._request("POST", f"/v1/integrations/{integration_type}/test")
+        return IntegrationTestResponse.model_validate(data)
 
 
 # ── Async resource ───────────────────────────────────────────────────────────
@@ -135,13 +133,11 @@ class AsyncIntegrationsResource(AsyncAPIResource):
         data = await self._request("DELETE", f"/v1/integrations/{integration_type}")
         return ActionResponse.model_validate(data)
 
-    async def test(self, integration_type: str) -> dict[str, Any]:
+    async def test(self, integration_type: str) -> IntegrationTestResponse:
         """Send a test notification through the specified integration.
 
         Args:
             integration_type: The integration type to test.
-
-        Returns:
-            Dict with ``success`` (bool) and ``message`` (str).
         """
-        return await self._request("POST", f"/v1/integrations/{integration_type}/test")
+        data = await self._request("POST", f"/v1/integrations/{integration_type}/test")
+        return IntegrationTestResponse.model_validate(data)

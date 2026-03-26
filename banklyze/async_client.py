@@ -11,6 +11,7 @@ import httpx
 
 from banklyze._base import ClientConfig
 from banklyze.resources.admin import AsyncAdminResource
+from banklyze.resources.instant import AsyncInstantResource
 from banklyze.resources.bvl import AsyncBVLResource
 from banklyze.resources.collaboration import (
     AsyncAssignmentsResource,
@@ -90,6 +91,7 @@ class AsyncBanklyzeClient:
 
         self.admin = AsyncAdminResource(self)
         self.bvl = AsyncBVLResource(self)
+        self.instant = AsyncInstantResource(self)
         self.crm = AsyncCrmResource(self)
         self.deals = AsyncDealsResource(self)
         self.documents = AsyncDocumentsResource(self)

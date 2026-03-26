@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-03-26
+
+### Added
+
+- **InstantResource** — new `client.instant` resource for free-tier PDF analysis (`analyze()`, `submit_feedback()`)
+- **Document triage** — `client.documents.triage()` for pre-processing classification, quality, and integrity checks
+- **Admin pipeline settings** — `client.admin.pipeline_settings()` and `update_pipeline_settings()`
+- **BVL SAM sub-endpoints** — `client.bvl.sam_create_run()`, `sam_list_runs()`, `sam_get_run()`, `sam_cancel_run()`, `sam_entities()`, `sam_stats()`
+- **Typed PageIterator** — `list_all()` now yields typed Pydantic models (`PageIterator[DealSummary]`, etc.) instead of raw dicts
+- **New type modules** — `banklyze.types.instant`, `banklyze.types.triage`, `banklyze.types.crm`, `banklyze.types.push`, `banklyze.types.oauth`
+- **HealthResponse** — typed model for `client.admin.health()`
+- **DealAnalyticsResponse** — typed model for `client.deals.analytics()`
+- **IntegrationTestResponse** — typed model for `client.integrations.test()`
+- **SAMEntity**, **SAMEntityListResponse**, **SAMStatsResponse** — typed models for BVL SAM endpoints
+- **Comprehensive test suite** — 129 tests across 11 test files covering errors, retry, pagination, and all resources
+
+### Changed
+
+- **Admin resource** — all methods now return typed models instead of `dict[str, Any]` (health, errors, usage_summary, usage_daily, usage_models, dlq_list, dlq_retry, dlq_discard)
+- **CRM resource** — all 8 methods now return typed models instead of `dict[str, Any]`
+- **Push resource** — all methods now return typed models (`VapidKeyResponse`, `PushStatusResponse`)
+- **OAuth resource** — `create_token()` now returns `OAuthTokenResponse`
+- **ConnectionTestResponse** — renamed from `TestConnectionResponse` to avoid pytest collection warning
+
 ## [1.2.0] - 2026-03-21
 
 ### Added

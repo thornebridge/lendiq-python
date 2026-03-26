@@ -11,6 +11,14 @@ import warnings
 from typing import Any
 
 from banklyze._base_resource import AsyncAPIResource, SyncAPIResource
+from banklyze.types.admin import (
+    ErrorLogListResponse,
+    HealthResponse,
+    UsageDailyResponse,
+    UsageModelsResponse,
+    UsageSummaryResponse,
+)
+from banklyze.types.dlq import DlqActionResponse, DlqListResponse
 
 
 # ── Sync resource ────────────────────────────────────────────────────────────
@@ -18,13 +26,14 @@ from banklyze._base_resource import AsyncAPIResource, SyncAPIResource
 
 class AdminResource(SyncAPIResource):
 
-    def health(self) -> dict[str, Any]:
+    def health(self) -> HealthResponse:
         """Get system health: DB connectivity, pipeline success rate, queue depth.
 
         Returns a dict with keys: ``db_connected``, ``pipeline_success_rate_24h``,
         ``pipelines_last_24h``, ``queue_depth``.
         """
-        return self._request("GET", "/v1/admin/health")
+        data = self._request("GET", "/v1/admin/health")
+        return HealthResponse.model_validate(data)
 
     def errors(
         self,
@@ -33,7 +42,7 @@ class AdminResource(SyncAPIResource):
         source: str | None = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> dict[str, Any]:
+    ) -> ErrorLogListResponse:
         """List recent error log entries.
 
         Args:
@@ -47,31 +56,35 @@ class AdminResource(SyncAPIResource):
             params["severity"] = severity
         if source is not None:
             params["source"] = source
-        return self._request("GET", "/v1/admin/errors", params=params)
+        data = self._request("GET", "/v1/admin/errors", params=params)
+        return ErrorLogListResponse.model_validate(data)
 
-    def usage_summary(self, *, days: int = 30) -> dict[str, Any]:
+    def usage_summary(self, *, days: int = 30) -> UsageSummaryResponse:
         """Get usage summary for the given period.
 
         Args:
             days: Lookback period in days (1-365, default 30).
         """
-        return self._request("GET", "/v1/admin/usage/summary", params={"days": days})
+        data = self._request("GET", "/v1/admin/usage/summary", params={"days": days})
+        return UsageSummaryResponse.model_validate(data)
 
-    def usage_daily(self, *, days: int = 30) -> dict[str, Any]:
+    def usage_daily(self, *, days: int = 30) -> UsageDailyResponse:
         """Get daily usage breakdown.
 
         Args:
             days: Lookback period in days (1-365, default 30).
         """
-        return self._request("GET", "/v1/admin/usage/daily", params={"days": days})
+        data = self._request("GET", "/v1/admin/usage/daily", params={"days": days})
+        return UsageDailyResponse.model_validate(data)
 
-    def usage_models(self, *, days: int = 30) -> dict[str, Any]:
+    def usage_models(self, *, days: int = 30) -> UsageModelsResponse:
         """Get usage breakdown by model.
 
         Args:
             days: Lookback period in days (1-365, default 30).
         """
-        return self._request("GET", "/v1/admin/usage/models", params={"days": days})
+        data = self._request("GET", "/v1/admin/usage/models", params={"days": days})
+        return UsageModelsResponse.model_validate(data)
 
     def get_constraints(self) -> dict[str, Any]:
         """Get underwriting constraint thresholds from the default ruleset.
@@ -119,20 +132,37 @@ class AdminResource(SyncAPIResource):
         task_name: str | None = None,
         page: int = 1,
         per_page: int = 25,
-    ) -> dict[str, Any]:
+    ) -> DlqListResponse:
         """List dead-letter queue entries."""
-        return self._request(
+        data = self._request(
             "GET", "/v1/admin/dlq",
             params={"status": status, "task_name": task_name, "page": page, "per_page": per_page},
         )
+        return DlqListResponse.model_validate(data)
 
-    def dlq_retry(self, entry_id: int) -> dict[str, Any]:
+    def dlq_retry(self, entry_id: int) -> DlqActionResponse:
         """Retry a failed DLQ entry."""
-        return self._request("POST", f"/v1/admin/dlq/{entry_id}/retry")
+        data = self._request("POST", f"/v1/admin/dlq/{entry_id}/retry")
+        return DlqActionResponse.model_validate(data)
 
-    def dlq_discard(self, entry_id: int) -> dict[str, Any]:
+    def dlq_discard(self, entry_id: int) -> DlqActionResponse:
         """Discard a DLQ entry."""
-        return self._request("POST", f"/v1/admin/dlq/{entry_id}/discard")
+        data = self._request("POST", f"/v1/admin/dlq/{entry_id}/discard")
+        return DlqActionResponse.model_validate(data)
+
+    def pipeline_settings(self) -> dict[str, Any]:
+        """Get pipeline settings for the current organization."""
+        return self._request("GET", "/v1/admin/pipeline-settings")
+
+    def update_pipeline_settings(self, **kwargs: Any) -> dict[str, Any]:
+        """Update pipeline settings for the current organization.
+
+        Keyword Args:
+            pipeline_llm: Enable/disable LLM extraction.
+            pipeline_vision: Enable/disable vision fallback.
+            pipeline_ai_screening: Enable/disable AI-powered screening.
+        """
+        return self._request("PUT", "/v1/admin/pipeline-settings", json=kwargs)
 
 
 # ── Async resource ───────────────────────────────────────────────────────────
@@ -140,13 +170,14 @@ class AdminResource(SyncAPIResource):
 
 class AsyncAdminResource(AsyncAPIResource):
 
-    async def health(self) -> dict[str, Any]:
+    async def health(self) -> HealthResponse:
         """Get system health: DB connectivity, pipeline success rate, queue depth.
 
         Returns a dict with keys: ``db_connected``, ``pipeline_success_rate_24h``,
         ``pipelines_last_24h``, ``queue_depth``.
         """
-        return await self._request("GET", "/v1/admin/health")
+        data = await self._request("GET", "/v1/admin/health")
+        return HealthResponse.model_validate(data)
 
     async def errors(
         self,
@@ -155,7 +186,7 @@ class AsyncAdminResource(AsyncAPIResource):
         source: str | None = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> dict[str, Any]:
+    ) -> ErrorLogListResponse:
         """List recent error log entries.
 
         Args:
@@ -169,31 +200,35 @@ class AsyncAdminResource(AsyncAPIResource):
             params["severity"] = severity
         if source is not None:
             params["source"] = source
-        return await self._request("GET", "/v1/admin/errors", params=params)
+        data = await self._request("GET", "/v1/admin/errors", params=params)
+        return ErrorLogListResponse.model_validate(data)
 
-    async def usage_summary(self, *, days: int = 30) -> dict[str, Any]:
+    async def usage_summary(self, *, days: int = 30) -> UsageSummaryResponse:
         """Get usage summary for the given period.
 
         Args:
             days: Lookback period in days (1-365, default 30).
         """
-        return await self._request("GET", "/v1/admin/usage/summary", params={"days": days})
+        data = await self._request("GET", "/v1/admin/usage/summary", params={"days": days})
+        return UsageSummaryResponse.model_validate(data)
 
-    async def usage_daily(self, *, days: int = 30) -> dict[str, Any]:
+    async def usage_daily(self, *, days: int = 30) -> UsageDailyResponse:
         """Get daily usage breakdown.
 
         Args:
             days: Lookback period in days (1-365, default 30).
         """
-        return await self._request("GET", "/v1/admin/usage/daily", params={"days": days})
+        data = await self._request("GET", "/v1/admin/usage/daily", params={"days": days})
+        return UsageDailyResponse.model_validate(data)
 
-    async def usage_models(self, *, days: int = 30) -> dict[str, Any]:
+    async def usage_models(self, *, days: int = 30) -> UsageModelsResponse:
         """Get usage breakdown by model.
 
         Args:
             days: Lookback period in days (1-365, default 30).
         """
-        return await self._request("GET", "/v1/admin/usage/models", params={"days": days})
+        data = await self._request("GET", "/v1/admin/usage/models", params={"days": days})
+        return UsageModelsResponse.model_validate(data)
 
     async def get_constraints(self) -> dict[str, Any]:
         """Get underwriting constraint thresholds from the default ruleset.
@@ -241,17 +276,34 @@ class AsyncAdminResource(AsyncAPIResource):
         task_name: str | None = None,
         page: int = 1,
         per_page: int = 25,
-    ) -> dict[str, Any]:
+    ) -> DlqListResponse:
         """List dead-letter queue entries."""
-        return await self._request(
+        data = await self._request(
             "GET", "/v1/admin/dlq",
             params={"status": status, "task_name": task_name, "page": page, "per_page": per_page},
         )
+        return DlqListResponse.model_validate(data)
 
-    async def dlq_retry(self, entry_id: int) -> dict[str, Any]:
+    async def dlq_retry(self, entry_id: int) -> DlqActionResponse:
         """Retry a failed DLQ entry."""
-        return await self._request("POST", f"/v1/admin/dlq/{entry_id}/retry")
+        data = await self._request("POST", f"/v1/admin/dlq/{entry_id}/retry")
+        return DlqActionResponse.model_validate(data)
 
-    async def dlq_discard(self, entry_id: int) -> dict[str, Any]:
+    async def dlq_discard(self, entry_id: int) -> DlqActionResponse:
         """Discard a DLQ entry."""
-        return await self._request("POST", f"/v1/admin/dlq/{entry_id}/discard")
+        data = await self._request("POST", f"/v1/admin/dlq/{entry_id}/discard")
+        return DlqActionResponse.model_validate(data)
+
+    async def pipeline_settings(self) -> dict[str, Any]:
+        """Get pipeline settings for the current organization."""
+        return await self._request("GET", "/v1/admin/pipeline-settings")
+
+    async def update_pipeline_settings(self, **kwargs: Any) -> dict[str, Any]:
+        """Update pipeline settings for the current organization.
+
+        Keyword Args:
+            pipeline_llm: Enable/disable LLM extraction.
+            pipeline_vision: Enable/disable vision fallback.
+            pipeline_ai_screening: Enable/disable AI-powered screening.
+        """
+        return await self._request("PUT", "/v1/admin/pipeline-settings", json=kwargs)

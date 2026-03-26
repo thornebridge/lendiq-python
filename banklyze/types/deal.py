@@ -342,3 +342,9 @@ class DailyStatsResponse(BaseModel):
     data: list[DailyStatEntry]
 
     model_config = {"extra": "allow"}
+
+
+class DealAnalyticsResponse(BaseModel):
+    """Analytics overview for deals."""
+
+    model_config = {"extra": "allow"}

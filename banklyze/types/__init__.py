@@ -7,6 +7,7 @@ New API fields will be accepted without breaking existing SDK consumers.
 from banklyze.types.admin import (
     ErrorLogEntry,
     ErrorLogListResponse,
+    HealthResponse,
     UsageDailyEntry,
     UsageDailyResponse,
     UsageModelsEntry,
@@ -26,6 +27,9 @@ from banklyze.types.bvl import (
     BVLStats,
     CallQueueLead,
     CallQueueResponse,
+    SAMEntity,
+    SAMEntityListResponse,
+    SAMStatsResponse,
 )
 from banklyze.types.collaboration import (
     ActivityEvent,
@@ -42,6 +46,14 @@ from banklyze.types.collaboration import (
     UserSearchResult,
 )
 from banklyze.types.common import ActionResponse, ErrorDetail, HealthFactor, PaginationMeta, ValidationDiscrepancy
+from banklyze.types.crm import (
+    CRMConfigResponse,
+    FieldMappingResponse,
+    SyncLogEntry,
+    SyncLogResponse,
+    SyncTriggerResponse,
+    ConnectionTestResponse,
+)
 from banklyze.types.deal import (
     BusinessSummary,
     CoverageSummary,
@@ -67,6 +79,7 @@ from banklyze.types.deal import (
     SelfReportedSummary,
     SourceSummary,
     TaxReturnDealSummary,
+    DealAnalyticsResponse,
 )
 from banklyze.types.dlq import DlqActionResponse, DlqEntry, DlqListResponse
 from banklyze.types.document import (
@@ -86,10 +99,20 @@ from banklyze.types.document import (
     PrescreenSummary,
 )
 from banklyze.types.event import SSEEvent
+from banklyze.types.instant import (
+    ExpenseCategory,
+    FeedbackResponse,
+    InstantAnalysisResponse,
+    InstantFileResult,
+    InstantSummary,
+    MCAPosition,
+    PositionCompliance,
+)
 from banklyze.types.integration import (
     ApiHealth,
     Integration,
     IntegrationHealthResponse,
+    IntegrationTestResponse,
     QueueHealth,
     QuotaUsage,
     WebhookHealth,
@@ -102,6 +125,7 @@ from banklyze.types.ingest import (
     IngestResponse,
 )
 from banklyze.types.key import APIKey, CreateKeyResponse, KeyListResponse
+from banklyze.types.oauth import OAuthTokenResponse
 from banklyze.types.notification import (
     AllPreferencesResponse,
     Notification,
@@ -109,6 +133,7 @@ from banklyze.types.notification import (
     NotificationPreference,
     UnreadCountResponse,
 )
+from banklyze.types.push import PushStatusResponse, VapidKeyResponse
 from banklyze.types.reviews import (
     ReviewActionResponse,
     ReviewDetailResponse,
@@ -131,6 +156,16 @@ from banklyze.types.sam_profile import (
 )
 from banklyze.types.share import ShareToken, ShareTokenListItem, ShareTokenListResponse
 from banklyze.types.team import InviteResponse, TeamListResponse, TeamMember
+from banklyze.types.triage import (
+    ConcatenationSignal,
+    DocumentClassification,
+    IntegrityCheck,
+    QualityAssessment,
+    TransactionSignals,
+    TriagePageAnalysis,
+    TriageRecommendation,
+    TriageResponse,
+)
 from banklyze.types.transaction import (
     Transaction,
     TransactionCorrection,
@@ -158,6 +193,7 @@ __all__ = [
     # Admin
     "ErrorLogEntry",
     "ErrorLogListResponse",
+    "HealthResponse",
     "UsageDailyEntry",
     "UsageDailyResponse",
     "UsageModelsEntry",
@@ -177,6 +213,9 @@ __all__ = [
     "BVLStats",
     "CallQueueLead",
     "CallQueueResponse",
+    "SAMEntity",
+    "SAMEntityListResponse",
+    "SAMStatsResponse",
     # Collaboration
     "ActivityEvent",
     "AssignedDealItem",
@@ -196,6 +235,13 @@ __all__ = [
     "HealthFactor",
     "PaginationMeta",
     "ValidationDiscrepancy",
+    # CRM
+    "CRMConfigResponse",
+    "FieldMappingResponse",
+    "SyncLogEntry",
+    "SyncLogResponse",
+    "SyncTriggerResponse",
+    "ConnectionTestResponse",
     # Deal
     "BusinessSummary",
     "CoverageSummary",
@@ -221,6 +267,7 @@ __all__ = [
     "SelfReportedSummary",
     "SourceSummary",
     "TaxReturnDealSummary",
+    "DealAnalyticsResponse",
     # DLQ
     "DlqActionResponse",
     "DlqEntry",
@@ -242,10 +289,19 @@ __all__ = [
     "PrescreenSummary",
     # Event
     "SSEEvent",
+    # Instant
+    "ExpenseCategory",
+    "FeedbackResponse",
+    "InstantAnalysisResponse",
+    "InstantFileResult",
+    "InstantSummary",
+    "MCAPosition",
+    "PositionCompliance",
     # Integration
     "ApiHealth",
     "Integration",
     "IntegrationHealthResponse",
+    "IntegrationTestResponse",
     "QueueHealth",
     "QuotaUsage",
     "WebhookHealth",
@@ -255,6 +311,8 @@ __all__ = [
     "BatchStatusResponse",
     "IngestDocumentResult",
     "IngestResponse",
+    # OAuth
+    "OAuthTokenResponse",
     # Key
     "APIKey",
     "CreateKeyResponse",
@@ -265,6 +323,9 @@ __all__ = [
     "NotificationListResponse",
     "NotificationPreference",
     "UnreadCountResponse",
+    # Push
+    "PushStatusResponse",
+    "VapidKeyResponse",
     # Review
     "ReviewActionResponse",
     "ReviewDetailResponse",
@@ -290,6 +351,15 @@ __all__ = [
     "InviteResponse",
     "TeamListResponse",
     "TeamMember",
+    # Triage
+    "ConcatenationSignal",
+    "DocumentClassification",
+    "IntegrityCheck",
+    "QualityAssessment",
+    "TransactionSignals",
+    "TriagePageAnalysis",
+    "TriageRecommendation",
+    "TriageResponse",
     # Transaction
     "Transaction",
     "TransactionCorrection",

@@ -74,3 +74,12 @@ class Integration(BaseModel):
     has_credentials: bool = False
 
     model_config = {"extra": "allow"}
+
+
+class IntegrationTestResponse(BaseModel):
+    """Result of testing an integration."""
+
+    success: bool
+    message: str | None = None
+
+    model_config = {"extra": "allow"}

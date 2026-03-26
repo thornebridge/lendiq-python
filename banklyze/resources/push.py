@@ -5,33 +5,40 @@ from __future__ import annotations
 from typing import Any
 
 from banklyze._base_resource import AsyncAPIResource, SyncAPIResource
+from banklyze.types.push import PushStatusResponse, VapidKeyResponse
 
 
 class PushResource(SyncAPIResource):
 
-    def vapid_key(self) -> dict[str, Any]:
+    def vapid_key(self) -> VapidKeyResponse:
         """Get the VAPID public key for web push subscriptions."""
-        return self._request("GET", "/v1/push/vapid-key")
+        data = self._request("GET", "/v1/push/vapid-key")
+        return VapidKeyResponse.model_validate(data)
 
-    def subscribe(self, **kwargs: Any) -> dict[str, Any]:
+    def subscribe(self, **kwargs: Any) -> PushStatusResponse:
         """Register or update a push subscription for the authenticated user."""
-        return self._request("POST", "/v1/push/subscribe", json=kwargs)
+        data = self._request("POST", "/v1/push/subscribe", json=kwargs)
+        return PushStatusResponse.model_validate(data)
 
-    def unsubscribe(self, **kwargs: Any) -> dict[str, Any]:
+    def unsubscribe(self, **kwargs: Any) -> PushStatusResponse:
         """Remove a push subscription for the authenticated user."""
-        return self._request("DELETE", "/v1/push/subscribe", json=kwargs)
+        data = self._request("DELETE", "/v1/push/subscribe", json=kwargs)
+        return PushStatusResponse.model_validate(data)
 
 
 class AsyncPushResource(AsyncAPIResource):
 
-    async def vapid_key(self) -> dict[str, Any]:
+    async def vapid_key(self) -> VapidKeyResponse:
         """Get the VAPID public key for web push subscriptions."""
-        return await self._request("GET", "/v1/push/vapid-key")
+        data = await self._request("GET", "/v1/push/vapid-key")
+        return VapidKeyResponse.model_validate(data)
 
-    async def subscribe(self, **kwargs: Any) -> dict[str, Any]:
+    async def subscribe(self, **kwargs: Any) -> PushStatusResponse:
         """Register or update a push subscription for the authenticated user."""
-        return await self._request("POST", "/v1/push/subscribe", json=kwargs)
+        data = await self._request("POST", "/v1/push/subscribe", json=kwargs)
+        return PushStatusResponse.model_validate(data)
 
-    async def unsubscribe(self, **kwargs: Any) -> dict[str, Any]:
+    async def unsubscribe(self, **kwargs: Any) -> PushStatusResponse:
         """Remove a push subscription for the authenticated user."""
-        return await self._request("DELETE", "/v1/push/subscribe", json=kwargs)
+        data = await self._request("DELETE", "/v1/push/subscribe", json=kwargs)
+        return PushStatusResponse.model_validate(data)

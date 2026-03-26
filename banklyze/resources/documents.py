@@ -11,12 +11,14 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from banklyze._base_resource import AsyncAPIResource, SyncAPIResource
+from banklyze.types.triage import TriageResponse
 from banklyze.types.document import (
     BatchDocumentStatusResponse,
     BulkUploadResponse,
     DocumentDetail,
     DocumentListResponse,
     DocumentStatusResponse,
+    DocumentSummary,
     DocumentUploadResponse,
 )
 
@@ -112,19 +114,20 @@ class DocumentsResource(SyncAPIResource):
         )
         return DocumentListResponse.model_validate(raw)
 
-    def list_all(self, deal_id: int, **filters: Any) -> PageIterator:
+    def list_all(self, deal_id: int, **filters: Any) -> PageIterator[DocumentSummary]:
         """Iterate over all documents for a deal, auto-fetching pages.
 
         Usage::
 
             for doc in client.documents.list_all(deal_id=42):
-                print(doc["id"], doc["document_type"])
+                print(doc.id, doc.document_type)
         """
         from banklyze.pagination import PageIterator
 
         return PageIterator(
             self._client,
             f"/v1/deals/{deal_id}/documents",
+            model=DocumentSummary,
             params=filters,
         )
 
@@ -185,6 +188,34 @@ class DocumentsResource(SyncAPIResource):
             json={"document_ids": document_ids},
         )
         return BatchDocumentStatusResponse.model_validate(raw)
+
+    def triage(
+        self,
+        file_path: str | Path,
+        *,
+        vision_fallback: bool = False,
+    ) -> TriageResponse:
+        """Triage a PDF — classify, assess quality, check integrity.
+
+        Pre-processing analysis without full pipeline execution.
+
+        Args:
+            file_path: Path to the PDF file.
+            vision_fallback: Use vision LLM fallback for classification.
+        """
+        p = Path(file_path)
+        params: dict[str, Any] = {}
+        if vision_fallback:
+            params["vision_fallback"] = True
+        with open(p, "rb") as f:
+            raw = self._request(
+                "POST",
+                "/v1/documents/triage",
+                files={"file": (p.name, f, "application/pdf")},
+                params=params or None,
+                timeout=self._client.TIMEOUT_UPLOAD,
+            )
+        return TriageResponse.model_validate(raw)
 
 
 # ---------------------------------------------------------------------------
@@ -258,13 +289,14 @@ class AsyncDocumentsResource(AsyncAPIResource):
         )
         return DocumentListResponse.model_validate(raw)
 
-    def list_all(self, deal_id: int, **filters: Any) -> AsyncPageIterator:
+    def list_all(self, deal_id: int, **filters: Any) -> AsyncPageIterator[DocumentSummary]:
         """Iterate over all documents for a deal, auto-fetching pages."""
         from banklyze.pagination import AsyncPageIterator
 
         return AsyncPageIterator(
             self._client,
             f"/v1/deals/{deal_id}/documents",
+            model=DocumentSummary,
             params=filters,
         )
 
@@ -325,3 +357,24 @@ class AsyncDocumentsResource(AsyncAPIResource):
             json={"document_ids": document_ids},
         )
         return BatchDocumentStatusResponse.model_validate(raw)
+
+    async def triage(
+        self,
+        file_path: str | Path,
+        *,
+        vision_fallback: bool = False,
+    ) -> TriageResponse:
+        """Triage a PDF — classify, assess quality, check integrity."""
+        p = Path(file_path)
+        params: dict[str, Any] = {}
+        if vision_fallback:
+            params["vision_fallback"] = True
+        with open(p, "rb") as f:
+            raw = await self._request(
+                "POST",
+                "/v1/documents/triage",
+                files={"file": (p.name, f, "application/pdf")},
+                params=params or None,
+                timeout=self._client.TIMEOUT_UPLOAD,
+            )
+        return TriageResponse.model_validate(raw)

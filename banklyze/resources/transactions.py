@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from banklyze._base_resource import AsyncAPIResource, SyncAPIResource
 from banklyze.types.transaction import (
+    Transaction,
     TransactionCorrectionListResponse,
     TransactionDetail,
     TransactionListResponse,
@@ -16,35 +17,37 @@ if TYPE_CHECKING:
 
 
 class TransactionsResource(SyncAPIResource):
-    def list_all_for_document(self, document_id: int, **filters: Any) -> PageIterator:
+    def list_all_for_document(self, document_id: int, **filters: Any) -> PageIterator[Transaction]:
         """Iterate over all transactions for a document, auto-fetching pages.
 
         Usage::
 
             for txn in client.transactions.list_all_for_document(document_id=7):
-                print(txn["date"], txn["amount"])
+                print(txn.date, txn.amount)
         """
         from banklyze.pagination import PageIterator
 
         return PageIterator(
             self._client,
             f"/v1/documents/{document_id}/transactions",
+            model=Transaction,
             params=filters,
         )
 
-    def list_all_for_deal(self, deal_id: int, **filters: Any) -> PageIterator:
+    def list_all_for_deal(self, deal_id: int, **filters: Any) -> PageIterator[Transaction]:
         """Iterate over all transactions for a deal, auto-fetching pages.
 
         Usage::
 
             for txn in client.transactions.list_all_for_deal(deal_id=42):
-                print(txn["date"], txn["amount"])
+                print(txn.date, txn.amount)
         """
         from banklyze.pagination import PageIterator
 
         return PageIterator(
             self._client,
             f"/v1/deals/{deal_id}/transactions",
+            model=Transaction,
             params=filters,
         )
 
@@ -188,22 +191,24 @@ class AsyncTransactionsResource(AsyncAPIResource):
         data = await self._request("GET", f"/v1/transactions/{transaction_id}/corrections")
         return TransactionCorrectionListResponse.model_validate(data)
 
-    def list_all_for_document(self, document_id: int, **filters: Any) -> AsyncPageIterator:
+    def list_all_for_document(self, document_id: int, **filters: Any) -> AsyncPageIterator[Transaction]:
         """Iterate over all transactions for a document, auto-fetching pages."""
         from banklyze.pagination import AsyncPageIterator
 
         return AsyncPageIterator(
             self._client,
             f"/v1/documents/{document_id}/transactions",
+            model=Transaction,
             params=filters,
         )
 
-    def list_all_for_deal(self, deal_id: int, **filters: Any) -> AsyncPageIterator:
+    def list_all_for_deal(self, deal_id: int, **filters: Any) -> AsyncPageIterator[Transaction]:
         """Iterate over all transactions for a deal, auto-fetching pages."""
         from banklyze.pagination import AsyncPageIterator
 
         return AsyncPageIterator(
             self._client,
             f"/v1/deals/{deal_id}/transactions",
+            model=Transaction,
             params=filters,
         )

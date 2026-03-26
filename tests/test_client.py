@@ -7,7 +7,7 @@ from banklyze import BanklyzeClient, __version__
 
 
 def test_version():
-    assert __version__ == "1.0.0"
+    assert __version__ == "1.3.0"
 
 
 def test_client_init():
@@ -28,9 +28,10 @@ def test_client_resources_complete():
     """All 19 top-level resources + 5 sub-resources are wired."""
     with BanklyzeClient(api_key="bk_test_xxx") as client:
         top_level = [
-            "admin", "crm", "deals", "documents", "events", "transactions",
-            "exports", "ingest", "integrations", "keys", "notifications",
-            "oauth", "onboarding", "push", "rulesets", "shares", "team",
+            "admin", "bvl", "crm", "deals", "documents", "events",
+            "transactions", "exports", "ingest", "instant", "integrations",
+            "keys", "notifications", "oauth", "onboarding", "push",
+            "reviews", "rulesets", "sam_profiles", "shares", "team",
             "usage", "webhooks",
         ]
         for name in top_level:
