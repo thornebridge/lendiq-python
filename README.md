@@ -1,22 +1,89 @@
 <div align="center">
+<br />
 
-# banklyze
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://banklyze.com/logo-white.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://banklyze.com/logo-dark.svg">
+  <img alt="Banklyze" src="https://banklyze.com/logo-dark.svg" width="220">
+</picture>
 
-Official Python SDK for the [Banklyze API](https://banklyze.com)
+<br />
+<br />
 
-[![PyPI version](https://img.shields.io/pypi/v/banklyze)](https://pypi.org/project/banklyze/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-%3E%3D3.10-brightgreen)](https://python.org)
-[![Typing: strict](https://img.shields.io/badge/typing-strict-blue)](https://peps.python.org/pep-0561/)
+### Upload a bank statement. Get an underwriting decision.
 
-AI-powered bank statement analysis for MCA underwriting.
-<br />Fully typed. Sync + async. Pydantic v2.
+The official Python SDK for the Banklyze API.<br />
+Turn months of manual underwriting into a single API call.
 
-[Documentation](https://docs.banklyze.com) &nbsp;&middot;&nbsp; [API Reference](https://docs.banklyze.com/api) &nbsp;&middot;&nbsp; [Changelog](CHANGELOG.md)
+<br />
 
+[![PyPI](https://img.shields.io/pypi/v/banklyze?style=flat-square&color=0a0a0a&labelColor=0a0a0a)](https://pypi.org/project/banklyze/)
+&nbsp;
+[![MIT](https://img.shields.io/badge/license-MIT-0a0a0a?style=flat-square&labelColor=0a0a0a)](LICENSE)
+&nbsp;
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-0a0a0a?style=flat-square&labelColor=0a0a0a)](https://python.org)
+&nbsp;
+[![Typed](https://img.shields.io/badge/types-strict-0a0a0a?style=flat-square&labelColor=0a0a0a)](https://peps.python.org/pep-0561/)
+&nbsp;
+[![Pydantic v2](https://img.shields.io/badge/pydantic-v2-0a0a0a?style=flat-square&labelColor=0a0a0a)](https://docs.pydantic.dev)
+
+<br />
+
+[Get API Key](https://app.banklyze.com) &nbsp;&middot;&nbsp; [Documentation](https://docs.banklyze.com) &nbsp;&middot;&nbsp; [API Reference](https://docs.banklyze.com/api) &nbsp;&middot;&nbsp; [Discord](https://discord.gg/banklyze)
+
+<br />
 </div>
 
 ---
+
+<br />
+
+## 7 lines. That's it.
+
+```python
+from banklyze import BanklyzeClient
+
+client = BanklyzeClient(api_key="bk_live_...")
+
+deal = client.deals.create(business_name="Acme Trucking LLC")
+client.documents.upload(deal.id, "statements/chase_jan.pdf")
+
+result = client.deals.get(deal.id)
+print(result.recommendation.decision)  # "approved"
+```
+
+That PDF just went through OCR extraction, LLM parsing, transaction screening, tamper detection, 12-factor health scoring, and a full underwriting recommendation. Your team didn't write a single rule.
+
+<br />
+
+## Why teams switch to Banklyze
+
+<table>
+<tr>
+<td width="50%">
+
+### Before Banklyze
+- Manual PDF review (20-40 min per deal)
+- Spreadsheet-based scoring
+- Inconsistent underwriting criteria
+- No tamper detection
+- Weeks to onboard new data sources
+
+</td>
+<td width="50%">
+
+### After Banklyze
+- Automated analysis (seconds per deal)
+- 12-factor composite health scoring
+- Configurable rulesets with version history
+- PDF integrity + tampering detection
+- One API call to process any bank statement
+
+</td>
+</tr>
+</table>
+
+<br />
 
 ## Install
 
@@ -24,213 +91,260 @@ AI-powered bank statement analysis for MCA underwriting.
 pip install banklyze
 ```
 
-## Quick Start
+> Requires Python 3.10+. Only two dependencies: `httpx` and `pydantic`.
+
+<br />
+
+## Sync and async, your choice
+
+Both clients have identical APIs. Pick the one that fits your stack.
 
 ```python
-from banklyze import BanklyzeClient
-
-client = BanklyzeClient(api_key="bk_live_...")
-
-# Create a deal and upload a statement
-deal = client.deals.create(business_name="Acme Trucking LLC")
-doc = client.documents.upload(deal.id, "chase_jan_2026.pdf")
-
-# Get the underwriting result
-detail = client.deals.get(deal.id)
-print(detail.health.health_grade)        # "B"
-print(detail.recommendation.decision)    # "approved"
-
-client.close()
+# Sync
+with BanklyzeClient(api_key="bk_live_...") as client:
+    deals = client.deals.list(status="ready")
 ```
 
-## Why This SDK
-
-- **Fully typed** — every method returns a Pydantic model. Full IDE autocompletion, not `dict`.
-- **Sync + async** — `BanklyzeClient` and `AsyncBanklyzeClient` with identical APIs.
-- **Automatic retries** — exponential backoff with jitter, rate limit aware, safe for mutations.
-- **Forward compatible** — all models use `extra="allow"`. API additions never break your code.
-
-## Usage
-
-### Typed Responses
-
-Every response is a Pydantic model with nested sub-objects:
-
 ```python
-detail = client.deals.get(42)
-
-# Financials
-detail.financials.avg_monthly_deposits
-detail.financials.avg_daily_balance
-
-# Health scoring (12 sub-factors)
-for name, factor in detail.health.factors.items():
-    print(f"{name}: {factor.score}/{factor.max}")
-
-# Underwriting recommendation
-detail.recommendation.decision    # "approved" | "conditional" | "declined"
-detail.recommendation.risk_factors
-detail.recommendation.strengths
-```
-
-### Async Client
-
-```python
+# Async
 from banklyze import AsyncBanklyzeClient
 
 async with AsyncBanklyzeClient(api_key="bk_live_...") as client:
     deals = await client.deals.list(status="ready")
-    for deal in deals.data:
-        print(deal.business_name, deal.health_grade)
 ```
 
-### Auto-Pagination
+<br />
 
-Iterate over all items across pages automatically:
+## Everything is typed
+
+Every method returns a Pydantic model. Not `dict`. Not `Any`. Real models with real autocompletion.
 
 ```python
-for deal in client.deals.list_all(status="ready"):
-    print(deal.business_name, deal.health_grade)  # typed DealSummary
+detail = client.deals.get(deal_id)
+
+# IDE knows every field, every nested object, every type
+detail.health.health_score                     # float
+detail.health.health_grade                     # str
+detail.recommendation.decision                 # "approved" | "conditional" | "declined"
+detail.recommendation.risk_factors             # list[str]
+detail.recommendation.strengths                # list[str]
+detail.financials.avg_monthly_deposits         # float
+detail.mca.mca_credit_score                    # float | None
+
+# 12 health sub-factors, individually scored and weighted
+for name, factor in detail.health.factors.items():
+    print(f"{name}: {factor.score}/{factor.max} (weight: {factor.weight})")
 ```
 
-### Document Analysis
+All response models are forward-compatible (`extra="allow"`). New API fields are accepted automatically — your code never breaks on deploy.
+
+<br />
+
+## Document intelligence, built in
+
+Upload a PDF and get back structured intelligence — no OCR pipeline to build, no LLM prompts to tune.
 
 ```python
 doc = client.documents.get(doc_id)
 
-# Pre-screen (regex-based, no LLM cost)
-doc.prescreen.bank_name
-doc.prescreen.viable
-doc.prescreen.confidence
+# Pre-screen (regex-based, instant, no LLM cost)
+doc.prescreen.bank_name          # "Chase"
+doc.prescreen.opening_balance    # 15420.00
+doc.prescreen.viable             # True
+doc.prescreen.confidence         # 0.95
 
 # Tamper detection
 doc.integrity.tampering_risk_level  # "clean" | "low" | "medium" | "high"
+doc.integrity.tampering_flags       # list[str]
 
-# Extraction quality
-doc.extraction_confidence_detail.overall_confidence
-doc.extraction_confidence_detail.overall_tier
+# Extraction confidence scoring
+doc.extraction_confidence_detail.overall_confidence  # 0.94
+doc.extraction_confidence_detail.overall_tier        # "HIGH"
+
+# Cross-document validation
+doc.analysis.validation_is_reliable       # True
+doc.analysis.validation_discrepancies     # list[ValidationDiscrepancy]
 ```
 
-### Real-Time Streaming
+<br />
 
-Stream pipeline progress via Server-Sent Events:
+## Instant analysis — no account required
+
+Let prospects try Banklyze before they sign up. The instant endpoint processes a PDF in under 2 seconds with no data persistence.
 
 ```python
-for event in client.events.stream(deal_id=42):
-    print(event.event, event.data)
+result = client.instant.analyze("statement.pdf")
+
+print(result.summary.total_deposits)        # 284500.00
+print(result.summary.total_mca_positions)   # 3
+print(result.summary.avg_revenue_quality)   # 0.82
+
+# Per-file breakdown
+for file in result.results:
+    print(file.bank_name, file.nsf_count, file.mca_daily_obligation)
 ```
 
-### Webhook Verification
+<br />
+
+## Real-time pipeline streaming
+
+Watch documents process in real time. No polling.
 
 ```python
-from banklyze.webhooks import verify_signature
-
-verify_signature(
-    payload=request.body,
-    signature=request.headers["X-Webhook-Signature"],
-    secret="whsec_...",
-)
+for event in client.events.stream(deal_id=deal_id):
+    if event.event == "stage":
+        print(f"Stage: {event.data}")  # "extracting_text" → "parsing" → "screening" → "scoring"
+    elif event.event == "complete":
+        print("Analysis complete")
 ```
 
-### Error Handling
+<br />
+
+## Auto-pagination
+
+Forget page math. Iterate over thousands of records with a single loop.
+
+```python
+for deal in client.deals.list_all(status="ready"):
+    print(deal.business_name, deal.health_grade)
+    # Typed as DealSummary — full autocompletion
+```
+
+<br />
+
+## Error handling that doesn't suck
+
+Every error is a typed exception with the context you need to debug. No parsing strings.
 
 ```python
 from banklyze.exceptions import NotFoundError, RateLimitError, ValidationError
 
 try:
-    client.deals.get(999)
+    client.deals.get(deal_id)
 except NotFoundError:
-    pass  # 404 — deal doesn't exist
+    # e.status_code == 404
+    pass
 except RateLimitError as e:
-    print(f"Retry after {e.retry_after}s")
+    # e.retry_after — seconds until you can retry
+    pass
 except ValidationError as e:
-    print(e.body)  # validation details
-
-# All errors include e.request_id for support correlation
+    # e.body — full validation error details
+    pass
+# Every error has e.request_id for instant support correlation
 ```
 
-### Idempotency
+<br />
+
+## Webhook verification in one line
 
 ```python
-client.deals.create(
-    business_name="Acme Trucking LLC",
-    idempotency_key="create-acme-001",  # safe to retry
-)
+from banklyze.webhooks import verify_signature
+
+# HMAC-SHA256 with constant-time comparison. Timing attacks don't apply.
+verify_signature(payload=body, signature=headers["X-Webhook-Signature"], secret="whsec_...")
 ```
+
+<br />
+
+## Built for production
+
+<table>
+<tr><td><strong>Automatic retries</strong></td><td>Exponential backoff with jitter. Honors <code>Retry-After</code>. Safe for mutations — POST/PUT/PATCH only retry on connection errors, never on HTTP status codes.</td></tr>
+<tr><td><strong>Idempotency</strong></td><td>Pass an idempotency key on any write. Retry all you want.</td></tr>
+<tr><td><strong>Request tracking</strong></td><td>Every request gets a UUID. Every error includes it. <code>client.last_request_id</code> is always available.</td></tr>
+<tr><td><strong>Timeouts</strong></td><td>Sensible defaults per operation type. <code>TIMEOUT_READ</code> (10s), <code>TIMEOUT_WRITE</code> (30s), <code>TIMEOUT_UPLOAD</code> (120s), <code>TIMEOUT_REPORT</code> (300s).</td></tr>
+<tr><td><strong>Forward compatible</strong></td><td>All models use <code>extra="allow"</code>. API updates never break your code.</td></tr>
+<tr><td><strong>PEP 561</strong></td><td><code>py.typed</code> marker included. Full <code>mypy --strict</code> support.</td></tr>
+</table>
+
+<br />
 
 ## Configuration
 
 ```python
 client = BanklyzeClient(
-    api_key="bk_live_...",
-    base_url="https://api.banklyze.com",  # default
-    timeout=30.0,                          # seconds, default
-    max_retries=2,                         # default
+    api_key="bk_live_...",               # required
+    base_url="https://api.banklyze.com", # default
+    timeout=30.0,                         # default (seconds)
+    max_retries=2,                        # default
+    logger=logging.getLogger("banklyze"), # optional debug logging
 )
-
-# Or as a context manager
-with BanklyzeClient(api_key="bk_live_...") as client:
-    deals = client.deals.list()
 ```
 
-| Timeout Constant | Value | Use Case |
-|-----------------|-------|----------|
-| `TIMEOUT_READ` | 10 s | List, get |
-| `TIMEOUT_WRITE` | 30 s | Create, update |
-| `TIMEOUT_UPLOAD` | 120 s | File uploads |
-| `TIMEOUT_REPORT` | 300 s | PDF generation |
+<br />
 
-## Resources
+## 25 resources. Full API coverage.
 
-| Resource | Access | Methods |
-|----------|--------|---------|
-| **Deals** | `client.deals` | CRUD, decision, evaluate, notes, stats, analytics, batch |
-| **Documents** | `client.documents` | Upload, bulk upload, status, reprocess, triage, classify |
-| **Transactions** | `client.transactions` | List, correct, corrections history |
-| **Exports** | `client.exports` | Deal/document CSV and PDF |
-| **Events** | `client.events` | SSE streams (deal, org, batch) |
-| **Webhooks** | `client.webhooks` | Config, test, delivery logs, retry |
-| **Rulesets** | `client.rulesets` | Underwriting criteria CRUD, set default |
-| **Ingest** | `client.ingest` | Bulk CRM ingest with batch tracking |
-| **BVL** | `client.bvl` | Business validation, call queue, SAM entities |
-| **SAM Profiles** | `client.sam_profiles` | SAM.gov search profiles, watchers, triggers |
-| **Reviews** | `client.reviews` | Document review queue, approve/correct |
-| **Instant** | `client.instant` | Free-tier instant PDF analysis |
-| **Team** | `client.team` | Invite, update, deactivate members |
-| **Keys** | `client.keys` | API key management |
-| **Notifications** | `client.notifications` | In-app notifications, preferences |
-| **CRM** | `client.crm` | Provider config, field mapping, sync |
-| **Integrations** | `client.integrations` | Slack, Teams, SMTP |
-| **Shares** | `client.shares` | Public deal share links |
-| **Admin** | `client.admin` | Health, usage, error logs, DLQ, pipeline settings |
-| **Usage** | `client.usage` | Metering, processing times |
-| **Push** | `client.push` | Web push subscriptions |
-| **OAuth** | `client.oauth` | Client credentials token exchange |
+Every endpoint in the Banklyze API has a typed method in this SDK.
 
-**Sub-resources on deals:**
+| | Resource | What it does |
+|-|----------|-------------|
+| **Core** | `client.deals` | CRUD, decision, evaluate, notes, stats, analytics, batch |
+| | `client.documents` | Upload, bulk upload, status, reprocess, triage, classify |
+| | `client.transactions` | List, correct, corrections history |
+| | `client.exports` | Deal and document CSV/PDF exports |
+| | `client.rulesets` | Underwriting criteria CRUD, versioned, set default |
+| **Intelligence** | `client.instant` | Free-tier instant PDF analysis (sub-2s, no persistence) |
+| | `client.bvl` | Business validation runs, call queue, SAM entities |
+| | `client.sam_profiles` | SAM.gov search profiles, watchers, automated triggers |
+| | `client.reviews` | Document review queue, approve/correct workflow |
+| **Real-time** | `client.events` | SSE streams for deals, org events, batch progress |
+| | `client.webhooks` | Webhook config, test, delivery logs, retry |
+| | `client.notifications` | In-app notifications and preferences |
+| | `client.push` | Web push subscriptions |
+| **Platform** | `client.team` | Invite, update, deactivate members |
+| | `client.keys` | API key management |
+| | `client.shares` | Public deal share links |
+| | `client.ingest` | Bulk CRM ingest with batch tracking |
+| | `client.crm` | Provider config, field mapping, bidirectional sync |
+| | `client.integrations` | Slack, Teams, SMTP notification channels |
+| | `client.admin` | Health, usage, error logs, DLQ, pipeline settings |
+| | `client.usage` | Metering and processing time analytics |
+| | `client.oauth` | Client credentials token exchange |
+
+**Plus 5 sub-resources on every deal:**
 
 ```python
-client.deals.comments.list(deal_id)
-client.deals.assignments.create(deal_id, user_id=5)
-client.deals.doc_requests.create(deal_id, ...)
-client.deals.timeline.list(deal_id)
-client.deals.users.search(q="jane")
+client.deals.comments.list(deal_id)        # threaded discussion
+client.deals.assignments.create(deal_id)   # assign reviewers
+client.deals.doc_requests.create(deal_id)  # request missing docs
+client.deals.timeline.list(deal_id)        # full activity history
+client.deals.users.search(q="jane")        # find team members
 ```
 
-## Retry Behavior
+<br />
 
-| Method | 429 | 5xx | Connection Error |
-|--------|-----|-----|-----------------|
+## Retry behavior
+
+| Method | Rate limit (429) | Server error (5xx) | Connection error |
+|--------|:---:|:---:|:---:|
 | GET / DELETE | Retry | Retry | Retry |
-| POST / PUT / PATCH | No | No | Retry |
+| POST / PUT / PATCH | &mdash; | &mdash; | Retry |
 
-Backoff: exponential with jitter (0.5 s base, 30 s cap). Honors `Retry-After` header.
+Exponential backoff with jitter. 0.5 s base, 30 s cap. Honors `Retry-After`.
 
-## Requirements
+<br />
 
-- Python 3.10+
-- httpx, pydantic (installed automatically)
+## We ship fast
+
+This SDK is actively maintained by the Banklyze engineering team. We release weekly, respond to issues within 24 hours, and treat SDK quality with the same rigor as our core platform.
+
+If something isn't right, [open an issue](https://github.com/thornebridge/banklyze-python/issues). We'll fix it.
+
+<br />
 
 ## License
 
-MIT
+MIT &mdash; use it however you want.
+
+<br />
+
+<div align="center">
+
+**[Get your API key](https://app.banklyze.com)** and start analyzing statements in minutes.
+
+<br />
+
+Built with care by the [Banklyze](https://banklyze.com) team.
+
+</div>
