@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from banklyze.types.document import (
+from lendiq.types.document import (
     BatchDocumentStatusResponse,
     DocumentDetail,
     DocumentListResponse,

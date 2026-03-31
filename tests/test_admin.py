@@ -6,14 +6,14 @@ import warnings
 
 import pytest
 
-from banklyze.types.admin import (
+from lendiq.types.admin import (
     ErrorLogListResponse,
     HealthResponse,
     UsageDailyResponse,
     UsageModelsResponse,
     UsageSummaryResponse,
 )
-from banklyze.types.dlq import DlqActionResponse, DlqListResponse
+from lendiq.types.dlq import DlqActionResponse, DlqListResponse
 from tests.conftest import make_response
 
 

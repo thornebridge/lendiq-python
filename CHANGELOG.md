@@ -12,13 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **InstantResource** — new `client.instant` resource for free-tier PDF analysis (`analyze()`, `submit_feedback()`)
 - **Document triage** — `client.documents.triage()` for pre-processing classification, quality, and integrity checks
 - **Admin pipeline settings** — `client.admin.pipeline_settings()` and `update_pipeline_settings()`
-- **BVL SAM sub-endpoints** — `client.bvl.sam_create_run()`, `sam_list_runs()`, `sam_get_run()`, `sam_cancel_run()`, `sam_entities()`, `sam_stats()`
+- **LVL SAM sub-endpoints** — `client.lvl.sam_create_run()`, `sam_list_runs()`, `sam_get_run()`, `sam_cancel_run()`, `sam_entities()`, `sam_stats()`
 - **Typed PageIterator** — `list_all()` now yields typed Pydantic models (`PageIterator[DealSummary]`, etc.) instead of raw dicts
-- **New type modules** — `banklyze.types.instant`, `banklyze.types.triage`, `banklyze.types.crm`, `banklyze.types.push`, `banklyze.types.oauth`
+- **New type modules** — `lendiq.types.instant`, `lendiq.types.triage`, `lendiq.types.crm`, `lendiq.types.push`, `lendiq.types.oauth`
 - **HealthResponse** — typed model for `client.admin.health()`
 - **DealAnalyticsResponse** — typed model for `client.deals.analytics()`
 - **IntegrationTestResponse** — typed model for `client.integrations.test()`
-- **SAMEntity**, **SAMEntityListResponse**, **SAMStatsResponse** — typed models for BVL SAM endpoints
+- **SAMEntity**, **SAMEntityListResponse**, **SAMStatsResponse** — typed models for LVL SAM endpoints
 - **Comprehensive test suite** — 129 tests across 11 test files covering errors, retry, pagination, and all resources
 
 ### Changed
@@ -67,12 +67,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Typed responses** — all resource methods return Pydantic models with full IDE autocompletion
-- **22 resource groups** covering the entire Banklyze API:
+- **22 resource groups** covering the entire LendIQ API:
   - Core: deals, documents, transactions, exports, events, webhooks, ingest, rulesets
   - Collaboration: comments, assignments, doc requests, timeline, user search
   - Platform: team, notifications, keys, shares, usage, search
   - Admin: admin, integrations, onboarding
-- **Sync + async clients** — `BanklyzeClient` and `AsyncBanklyzeClient`
+- **Sync + async clients** — `LendIQClient` and `AsyncLendIQClient`
 - **Auto-pagination** — `list_all()` iterators on list endpoints
 - **Retry with backoff** — exponential backoff with jitter, safe mutation handling
 - **Webhook signature verification** — `verify_signature()` for HMAC-SHA256

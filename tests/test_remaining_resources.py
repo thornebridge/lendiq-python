@@ -1,5 +1,5 @@
 """Test remaining resources — webhooks config, keys, team, shares, notifications,
-CRM, integrations, push, oauth, onboarding, BVL, SAM profiles, reviews, instant.
+CRM, integrations, push, oauth, onboarding, LVL, SAM profiles, reviews, instant.
 
 One or two tests per resource verifying the basic request pattern.
 """
@@ -8,23 +8,23 @@ from __future__ import annotations
 
 import pytest
 
-from banklyze.types.common import ActionResponse
-from banklyze.types.crm import (
+from lendiq.types.common import ActionResponse
+from lendiq.types.crm import (
     CRMConfigResponse,
     FieldMappingResponse,
     SyncLogResponse,
     SyncTriggerResponse,
     ConnectionTestResponse,
 )
-from banklyze.types.integration import Integration, IntegrationHealthResponse, IntegrationTestResponse
-from banklyze.types.key import CreateKeyResponse, KeyListResponse
-from banklyze.types.notification import NotificationListResponse, UnreadCountResponse
-from banklyze.types.oauth import OAuthTokenResponse
-from banklyze.types.push import PushStatusResponse, VapidKeyResponse
-from banklyze.types.reviews import ReviewActionResponse, ReviewDetailResponse, ReviewListResponse
-from banklyze.types.share import ShareToken, ShareTokenListResponse
-from banklyze.types.team import InviteResponse, TeamListResponse, TeamMember
-from banklyze.types.webhook import (
+from lendiq.types.integration import Integration, IntegrationHealthResponse, IntegrationTestResponse
+from lendiq.types.key import CreateKeyResponse, KeyListResponse
+from lendiq.types.notification import NotificationListResponse, UnreadCountResponse
+from lendiq.types.oauth import OAuthTokenResponse
+from lendiq.types.push import PushStatusResponse, VapidKeyResponse
+from lendiq.types.reviews import ReviewActionResponse, ReviewDetailResponse, ReviewListResponse
+from lendiq.types.share import ShareToken, ShareTokenListResponse
+from lendiq.types.team import InviteResponse, TeamListResponse, TeamMember
+from lendiq.types.webhook import (
     WebhookConfig,
     WebhookDeliveryListResponse,
     WebhookTestResult,
@@ -130,8 +130,8 @@ def test_keys_create(mock_client):
         {
             "id": 1,
             "name": "Production Key",
-            "key": "bk_live_xxxxxxxxxxxx",
-            "key_prefix": "bk_live_xxxx",
+            "key": "liq_live_xxxxxxxxxxxx",
+            "key_prefix": "liq_live_xxxx",
             "scopes": "read,write",
             "expires_at": None,
             "created_at": "2026-02-01T10:00:00",
@@ -141,7 +141,7 @@ def test_keys_create(mock_client):
     result = mock_client.keys.create(name="Production Key")
 
     assert isinstance(result, CreateKeyResponse)
-    assert result.key.startswith("bk_live_")
+    assert result.key.startswith("liq_live_")
     assert result.name == "Production Key"
 
 
@@ -153,7 +153,7 @@ def test_keys_list(mock_client):
                 {
                     "id": 1,
                     "name": "Production Key",
-                    "key_prefix": "bk_live_xxxx",
+                    "key_prefix": "liq_live_xxxx",
                     "scopes": "read,write",
                     "is_active": True,
                     "created_at": "2026-02-01T10:00:00",
@@ -189,7 +189,7 @@ def test_team_list(mock_client):
             "data": [
                 {
                     "id": 1,
-                    "email": "admin@banklyze.com",
+                    "email": "admin@lendiq.com",
                     "display_name": "Admin User",
                     "role": "admin",
                     "is_active": True,
@@ -213,17 +213,17 @@ def test_team_invite(mock_client):
         201,
         {
             "user_id": 10,
-            "email": "new@banklyze.com",
+            "email": "new@lendiq.com",
             "role": "analyst",
-            "invite_url": "https://app.banklyze.com/invite/xyz",
+            "invite_url": "https://app.lendiq.com/invite/xyz",
             "message": "Invitation sent",
         },
     )
 
-    result = mock_client.team.invite(email="new@banklyze.com", role="analyst")
+    result = mock_client.team.invite(email="new@lendiq.com", role="analyst")
 
     assert isinstance(result, InviteResponse)
-    assert result.email == "new@banklyze.com"
+    assert result.email == "new@lendiq.com"
     assert result.role == "analyst"
 
 
@@ -232,7 +232,7 @@ def test_team_update(mock_client):
         200,
         {
             "id": 10,
-            "email": "new@banklyze.com",
+            "email": "new@lendiq.com",
             "display_name": "New User",
             "role": "underwriter",
             "is_active": True,
@@ -266,7 +266,7 @@ def test_shares_create(mock_client):
         {
             "id": 1,
             "token": "sha_xxxxxxxxxxxx",
-            "share_url": "https://app.banklyze.com/shared/sha_xxxxxxxxxxxx",
+            "share_url": "https://app.lendiq.com/shared/sha_xxxxxxxxxxxx",
             "view_mode": "summary",
             "expires_at": "2026-03-01T00:00:00",
             "created_at": "2026-02-22T10:00:00",
@@ -288,7 +288,7 @@ def test_shares_list(mock_client):
                 {
                     "id": 1,
                     "token": "sha_xxxxxxxxxxxx",
-                    "share_url": "https://app.banklyze.com/shared/sha_xxxxxxxxxxxx",
+                    "share_url": "https://app.lendiq.com/shared/sha_xxxxxxxxxxxx",
                     "view_mode": "summary",
                     "is_active": True,
                     "access_count": 3,
@@ -666,13 +666,13 @@ def test_reviews_correct(mock_client):
     assert result.review_status == "corrected"
 
 
-# ── BVL ─────────────────────────────────────────────────────────────────────
+# ── LVL ─────────────────────────────────────────────────────────────────────
 
 
-def test_bvl_list_runs(mock_client):
-    from banklyze.types.bvl import BVLRunListResponse
+def test_lvl_list_runs(mock_client):
+    from lendiq.types.lvl import LVLRunListResponse
 
-    mock_client._responses["GET /v1/bvl/runs"] = make_response(
+    mock_client._responses["GET /v1/lvl/runs"] = make_response(
         200,
         {
             "data": [
@@ -689,17 +689,17 @@ def test_bvl_list_runs(mock_client):
         },
     )
 
-    result = mock_client.bvl.list_runs()
+    result = mock_client.lvl.list_runs()
 
-    assert isinstance(result, BVLRunListResponse)
+    assert isinstance(result, LVLRunListResponse)
     assert len(result.data) == 1
     assert result.data[0].status == "completed"
 
 
-def test_bvl_create_run(mock_client):
-    from banklyze.types.bvl import BVLRun
+def test_lvl_create_run(mock_client):
+    from lendiq.types.lvl import LVLRun
 
-    mock_client._responses["POST /v1/bvl/runs"] = make_response(
+    mock_client._responses["POST /v1/lvl/runs"] = make_response(
         201,
         {
             "id": 2,
@@ -711,9 +711,9 @@ def test_bvl_create_run(mock_client):
         },
     )
 
-    result = mock_client.bvl.create_run()
+    result = mock_client.lvl.create_run()
 
-    assert isinstance(result, BVLRun)
+    assert isinstance(result, LVLRun)
     assert result.status == "running"
 
 
@@ -721,7 +721,7 @@ def test_bvl_create_run(mock_client):
 
 
 def test_sam_profiles_list(mock_client):
-    from banklyze.types.sam_profile import SAMSearchProfileListResponse
+    from lendiq.types.sam_profile import SAMSearchProfileListResponse
 
     mock_client._responses["GET /v1/sam/profiles"] = make_response(
         200,
@@ -754,7 +754,7 @@ def test_sam_profiles_list(mock_client):
 
 
 def test_sam_profiles_create(mock_client):
-    from banklyze.types.sam_profile import SAMSearchProfile
+    from lendiq.types.sam_profile import SAMSearchProfile
 
     mock_client._responses["POST /v1/sam/profiles"] = make_response(
         201,

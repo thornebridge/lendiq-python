@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from banklyze.types.common import ActionResponse
-from banklyze.types.ruleset import Ruleset, RulesetListResponse
+from lendiq.types.common import ActionResponse
+from lendiq.types.ruleset import Ruleset, RulesetListResponse
 from tests.conftest import make_response
 
 
@@ -43,7 +43,7 @@ SAMPLE_RULESET = {
     "weight_revenue_quality": 3.0,
     "weight_daily_velocity": 2.0,
     "updated_at": "2026-01-01T00:00:00",
-    "updated_by": "admin@banklyze.com",
+    "updated_by": "admin@lendiq.com",
 }
 
 SAMPLE_RULESET_LIST = {

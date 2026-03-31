@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 
-from banklyze import BanklyzeClient, __version__
+from lendiq import LendIQClient, __version__
 
 
 def test_version():
@@ -11,7 +11,7 @@ def test_version():
 
 
 def test_client_init():
-    client = BanklyzeClient(api_key="bk_test_xxx")
+    client = LendIQClient(api_key="liq_test_xxx")
     assert client.last_request_id is None
     assert client.deals is not None
     assert client.documents is not None
@@ -20,15 +20,15 @@ def test_client_init():
 
 
 def test_client_context_manager():
-    with BanklyzeClient(api_key="bk_test_xxx") as client:
+    with LendIQClient(api_key="liq_test_xxx") as client:
         assert client.deals is not None
 
 
 def test_client_resources_complete():
     """All 19 top-level resources + 5 sub-resources are wired."""
-    with BanklyzeClient(api_key="bk_test_xxx") as client:
+    with LendIQClient(api_key="liq_test_xxx") as client:
         top_level = [
-            "admin", "bvl", "crm", "deals", "documents", "events",
+            "admin", "lvl", "crm", "deals", "documents", "events",
             "transactions", "exports", "ingest", "instant", "integrations",
             "keys", "notifications", "oauth", "onboarding", "push",
             "reviews", "rulesets", "sam_profiles", "shares", "team",

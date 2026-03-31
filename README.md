@@ -2,24 +2,24 @@
 <br />
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://banklyze.com/icons/banklyze-mark-white.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://banklyze.com/icons/Banklyze-Logo.svg">
-  <img alt="Banklyze" src="https://banklyze.com/icons/Banklyze-Logo.svg" width="48">
+  <source media="(prefers-color-scheme: dark)" srcset="https://iq.lend.works/icons/lendiq-mark-white.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://iq.lend.works/icons/LendIQ-Logo.svg">
+  <img alt="LendIQ" src="https://iq.lend.works/icons/LendIQ-Logo.svg" width="48">
 </picture>
 <br />
-<samp><b>B A N K L Y Z E</b></samp>
+<samp><b>L E N D I Q</b></samp>
 
 <br />
 <br />
 
 ### Upload a bank statement. Get an underwriting decision.
 
-The official Python SDK for the Banklyze API.<br />
+The official Python SDK for the LendIQ API.<br />
 Turn months of manual underwriting into a single API call.
 
 <br />
 
-[![PyPI](https://img.shields.io/pypi/v/banklyze?style=flat-square&color=0a0a0a&labelColor=0a0a0a)](https://pypi.org/project/banklyze/)
+[![PyPI](https://img.shields.io/pypi/v/lendiq?style=flat-square&color=0a0a0a&labelColor=0a0a0a)](https://pypi.org/project/lendiq/)
 &nbsp;
 [![MIT](https://img.shields.io/badge/license-MIT-0a0a0a?style=flat-square&labelColor=0a0a0a)](LICENSE)
 &nbsp;
@@ -31,7 +31,7 @@ Turn months of manual underwriting into a single API call.
 
 <br />
 
-[Get API Key](https://banklyze.com) &nbsp;&middot;&nbsp; [Documentation](https://docs.banklyze.com) &nbsp;&middot;&nbsp; [API Reference](https://docs.banklyze.com/api)
+[Get API Key](https://iq.lend.works) &nbsp;&middot;&nbsp; [Documentation](https://docs.lend.works) &nbsp;&middot;&nbsp; [API Reference](https://docs.lend.works/api)
 
 <br />
 </div>
@@ -43,9 +43,9 @@ Turn months of manual underwriting into a single API call.
 ## 7 lines. That's it.
 
 ```python
-from banklyze import BanklyzeClient
+from lendiq import LendIQClient
 
-client = BanklyzeClient(api_key="bk_live_...")
+client = LendIQClient(api_key="liq_live_...")
 
 deal = client.deals.create(business_name="Acme Trucking LLC")
 client.documents.upload(deal.id, "statements/chase_jan.pdf")
@@ -54,17 +54,17 @@ result = client.deals.get(deal.id)
 print(result.recommendation.decision)  # "approved"
 ```
 
-That PDF just went through OCR extraction, LLM parsing, transaction screening, tamper detection, 12-factor health scoring, and a full underwriting recommendation. Your team didn't write a single rule.
+That PDF just went through Gemini-powered extraction, transaction screening, tamper detection, 12-factor health scoring, and a full underwriting recommendation. Your team didn't write a single rule.
 
 <br />
 
-## Why teams switch to Banklyze
+## Why teams switch to LendIQ
 
 <table>
 <tr>
 <td width="50%">
 
-### Before Banklyze
+### Before LendIQ
 - Manual PDF review (20-40 min per deal)
 - Spreadsheet-based scoring
 - Inconsistent underwriting criteria
@@ -74,7 +74,7 @@ That PDF just went through OCR extraction, LLM parsing, transaction screening, t
 </td>
 <td width="50%">
 
-### After Banklyze
+### After LendIQ
 - Automated analysis (seconds per deal)
 - 12-factor composite health scoring
 - Configurable rulesets with version history
@@ -87,13 +87,13 @@ That PDF just went through OCR extraction, LLM parsing, transaction screening, t
 
 <br />
 
-## Banklyze vs. the alternatives
+## LendIQ vs. the alternatives
 
-| | **Banklyze** | Ocrolus | LendAPI | Plaid (Asset Reports) | DIY (in-house) |
+| | **LendIQ** | Ocrolus | LendAPI | Plaid (Asset Reports) | DIY (in-house) |
 |---|:---:|:---:|:---:|:---:|:---:|
 | Upload PDF &rarr; full underwriting decision | **Yes** | No | Partial | No | Build it yourself |
 | Bank statement + tax return + P&L support | **All three** | Statements only | Statements only | No PDFs | Depends on scope |
-| LLM-powered extraction | **Yes** | Template OCR | Template OCR | N/A | Build it yourself |
+| Gemini native PDF extraction | **Yes** | Template OCR | Template OCR | N/A | Build it yourself |
 | Tamper / fraud detection | **Built in** | Add-on | No | No | Build it yourself |
 | Health scoring (12 sub-factors) | **Built in** | No | Basic | No | Build it yourself |
 | Underwriting recommendation engine | **Built in** | No | Basic | No | Build it yourself |
@@ -110,7 +110,7 @@ We don't just extract data from bank statements. We **understand** them — and 
 ## Install
 
 ```bash
-pip install banklyze
+pip install lendiq
 ```
 
 > Requires Python 3.10+. Only two dependencies: `httpx` and `pydantic`.
@@ -123,15 +123,15 @@ Both clients have identical APIs. Pick the one that fits your stack.
 
 ```python
 # Sync
-with BanklyzeClient(api_key="bk_live_...") as client:
+with LendIQClient(api_key="liq_live_...") as client:
     deals = client.deals.list(status="ready")
 ```
 
 ```python
 # Async
-from banklyze import AsyncBanklyzeClient
+from lendiq import AsyncLendIQClient
 
-async with AsyncBanklyzeClient(api_key="bk_live_...") as client:
+async with AsyncLendIQClient(api_key="liq_live_...") as client:
     deals = await client.deals.list(status="ready")
 ```
 
@@ -164,35 +164,39 @@ All response models are forward-compatible (`extra="allow"`). New API fields are
 
 ## Document intelligence, built in
 
-Upload a PDF and get back structured intelligence — no OCR pipeline to build, no LLM prompts to tune.
+Upload a PDF and get back structured intelligence — no OCR pipeline, no prompt engineering, no infra to manage.
 
 ```python
 doc = client.documents.get(doc_id)
 
-# Pre-screen (regex-based, instant, no LLM cost)
-doc.prescreen.bank_name          # "Chase"
-doc.prescreen.opening_balance    # 15420.00
-doc.prescreen.viable             # True
-doc.prescreen.confidence         # 0.95
+# Extraction metadata
+doc.extraction_method       # "gemini_native_pdf"
+doc.extraction_confidence   # 0.94
+doc.document_type           # "bank_statement"
 
 # Tamper detection
 doc.integrity.tampering_risk_level  # "clean" | "low" | "medium" | "high"
-doc.integrity.tampering_flags       # list[str]
 
-# Extraction confidence scoring
-doc.extraction_confidence_detail.overall_confidence  # 0.94
-doc.extraction_confidence_detail.overall_tier        # "HIGH"
+# Financial analysis (bank statements)
+doc.analysis.average_daily_balance   # 16215.30
+doc.analysis.total_deposits          # 48920.00
+doc.analysis.health_score            # 78.5
+doc.analysis.health_grade            # "B"
 
-# Cross-document validation
-doc.analysis.validation_is_reliable       # True
-doc.analysis.validation_discrepancies     # list[ValidationDiscrepancy]
+# Identity verification (driver's licenses)
+doc.driver_license_analysis.full_name         # "John Smith"
+doc.driver_license_analysis.expiration_date   # "2028-06-15"
+
+# Bank verification (voided checks)
+doc.voided_check_analysis.routing_number       # "021000021"
+doc.voided_check_analysis.is_voided            # True
 ```
 
 <br />
 
 ## Instant analysis — no account required
 
-Let prospects try Banklyze before they sign up. The instant endpoint processes a PDF in under 2 seconds with no data persistence.
+Let prospects try LendIQ before they sign up. The instant endpoint processes a PDF in under 2 seconds with no data persistence.
 
 ```python
 result = client.instant.analyze("statement.pdf")
@@ -215,7 +219,7 @@ Watch documents process in real time. No polling.
 ```python
 for event in client.events.stream(deal_id=deal_id):
     if event.event == "stage":
-        print(f"Stage: {event.data}")  # "extracting_text" → "parsing" → "screening" → "scoring"
+        print(f"Stage: {event.data}")  # "classifying" → "extracting" → "screening" → "scoring"
     elif event.event == "complete":
         print("Analysis complete")
 ```
@@ -239,7 +243,7 @@ for deal in client.deals.list_all(status="ready"):
 Every error is a typed exception with the context you need to debug. No parsing strings.
 
 ```python
-from banklyze.exceptions import NotFoundError, RateLimitError, ValidationError
+from lendiq.exceptions import NotFoundError, RateLimitError, ValidationError
 
 try:
     client.deals.get(deal_id)
@@ -260,7 +264,7 @@ except ValidationError as e:
 ## Webhook verification in one line
 
 ```python
-from banklyze.webhooks import verify_signature
+from lendiq.webhooks import verify_signature
 
 # HMAC-SHA256 with constant-time comparison. Timing attacks don't apply.
 verify_signature(payload=body, signature=headers["X-Webhook-Signature"], secret="whsec_...")
@@ -284,12 +288,12 @@ verify_signature(payload=body, signature=headers["X-Webhook-Signature"], secret=
 ## Configuration
 
 ```python
-client = BanklyzeClient(
-    api_key="bk_live_...",               # required
-    base_url="https://api.banklyze.com", # default
+client = LendIQClient(
+    api_key="liq_live_...",               # required
+    base_url="https://iq.lend.works", # default
     timeout=30.0,                         # default (seconds)
     max_retries=2,                        # default
-    logger=logging.getLogger("banklyze"), # optional debug logging
+    logger=logging.getLogger("lendiq"), # optional debug logging
 )
 ```
 
@@ -297,7 +301,7 @@ client = BanklyzeClient(
 
 ## 25 resources. Full API coverage.
 
-Every endpoint in the Banklyze API has a typed method in this SDK.
+Every endpoint in the LendIQ API has a typed method in this SDK.
 
 | | Resource | What it does |
 |-|----------|-------------|
@@ -307,7 +311,7 @@ Every endpoint in the Banklyze API has a typed method in this SDK.
 | | `client.exports` | Deal and document CSV/PDF exports |
 | | `client.rulesets` | Underwriting criteria CRUD, versioned, set default |
 | **Intelligence** | `client.instant` | Free-tier instant PDF analysis (sub-2s, no persistence) |
-| | `client.bvl` | Business validation runs, call queue, SAM entities |
+| | `client.lvl` | Business validation runs, call queue, SAM entities |
 | | `client.sam_profiles` | SAM.gov search profiles, watchers, automated triggers |
 | | `client.reviews` | Document review queue, approve/correct workflow |
 | **Real-time** | `client.events` | SSE streams for deals, org events, batch progress |
@@ -349,9 +353,9 @@ Exponential backoff with jitter. 0.5 s base, 30 s cap. Honors `Retry-After`.
 
 ## We ship fast
 
-This SDK is actively maintained by the Banklyze engineering team. We release weekly, respond to issues within 24 hours, and treat SDK quality with the same rigor as our core platform.
+This SDK is actively maintained by the LendIQ engineering team. We release weekly, respond to issues within 24 hours, and treat SDK quality with the same rigor as our core platform.
 
-If something isn't right, [open an issue](https://github.com/thornebridge/banklyze-python/issues). We'll fix it.
+If something isn't right, [open an issue](https://github.com/thornebridge/lendiq-python/issues). We'll fix it.
 
 <br />
 
@@ -363,10 +367,10 @@ MIT &mdash; use it however you want.
 
 <div align="center">
 
-**[Get your API key](https://banklyze.com)** and start analyzing statements in minutes.
+**[Get your API key](https://iq.lend.works)** and start analyzing statements in minutes.
 
 <br />
 
-Built with care by the [Banklyze](https://banklyze.com) team.
+Built with care by the [LendIQ](https://iq.lend.works) team.
 
 </div>

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from banklyze.types import (
+from lendiq.types import (
     DealDetail,
     DealListResponse,
     DealSummary,

@@ -4,17 +4,17 @@ from __future__ import annotations
 
 import pytest
 
-from banklyze.types import DealListResponse, DealSummary, DealStats
-from banklyze.types.common import ActionResponse
-from banklyze.types.deal import (
+from lendiq.types import DealListResponse, DealSummary, DealStats
+from lendiq.types.common import ActionResponse
+from lendiq.types.deal import (
     DailyStatsResponse,
     DealAnalyticsResponse,
     DealDetail,
     DealNote,
     DealNotesListResponse,
 )
-from banklyze.types.ruleset import ComparativeEvaluationResponse
-from banklyze.types.underwriting import Recommendation
+from lendiq.types.ruleset import ComparativeEvaluationResponse
+from lendiq.types.underwriting import Recommendation
 from tests.conftest import SAMPLE_DEAL, SAMPLE_DEAL_LIST, make_response
 
 

@@ -7,8 +7,8 @@ import hmac
 
 import pytest
 
-from banklyze.exceptions import InvalidSignatureError
-from banklyze.webhooks import verify_signature
+from lendiq.exceptions import InvalidSignatureError
+from lendiq.webhooks import verify_signature
 
 
 def test_verify_valid_signature():

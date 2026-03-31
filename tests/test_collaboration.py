@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from banklyze.types.collaboration import (
+from lendiq.types.collaboration import (
     AssignedDealsResponse,
     Assignment,
     AssignmentListResponse,
@@ -15,7 +15,7 @@ from banklyze.types.collaboration import (
     TimelineResponse,
     UserSearchResponse,
 )
-from banklyze.types.common import ActionResponse
+from lendiq.types.common import ActionResponse
 from tests.conftest import make_response
 
 
@@ -30,7 +30,7 @@ SAMPLE_COMMENT = {
     "mentions": [],
     "created_at": "2026-02-10T14:30:00",
     "updated_at": "2026-02-10T14:30:00",
-    "author_email": "analyst@banklyze.com",
+    "author_email": "analyst@lendiq.com",
     "author_display_name": "Jane Analyst",
 }
 
@@ -43,7 +43,7 @@ SAMPLE_ASSIGNMENT = {
     "role": "assignee",
     "assigned_by_id": 3,
     "created_at": "2026-02-10T10:00:00",
-    "user_email": "analyst@banklyze.com",
+    "user_email": "analyst@lendiq.com",
     "user_display_name": "Jane Analyst",
 }
 
@@ -85,7 +85,7 @@ SAMPLE_USER_SEARCH = {
     "data": [
         {
             "id": 5,
-            "email": "analyst@banklyze.com",
+            "email": "analyst@lendiq.com",
             "display_name": "Jane Analyst",
             "role": "analyst",
         }
@@ -298,5 +298,5 @@ def test_user_search(mock_client):
 
     assert isinstance(result, UserSearchResponse)
     assert len(result.data) == 1
-    assert result.data[0].email == "analyst@banklyze.com"
+    assert result.data[0].email == "analyst@lendiq.com"
     assert result.data[0].role == "analyst"

@@ -8,7 +8,7 @@ from typing import Any
 import httpx
 import pytest
 
-from banklyze import BanklyzeClient
+from lendiq import LendIQClient
 
 
 def make_response(
@@ -138,7 +138,7 @@ SAMPLE_RULESET = {
     "weight_revenue_quality": 3.0,
     "weight_daily_velocity": 2.0,
     "updated_at": "2026-01-01T00:00:00",
-    "updated_by": "admin@banklyze.com",
+    "updated_by": "admin@lendiq.com",
 }
 
 SAMPLE_HEALTH = {
@@ -164,7 +164,7 @@ SAMPLE_ERROR_LOG = {
 
 @pytest.fixture
 def mock_client(monkeypatch):
-    """BanklyzeClient with a mock transport that returns canned responses."""
+    """LendIQClient with a mock transport that returns canned responses."""
     responses: dict[str, httpx.Response] = {}
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -175,12 +175,12 @@ def mock_client(monkeypatch):
         return make_response(404, {"error": "Not found", "code": "RESOURCE_NOT_FOUND"})
 
     transport = httpx.MockTransport(handler)
-    client = BanklyzeClient(api_key="bk_test_xxx", base_url="https://test.banklyze.com")
+    client = LendIQClient(api_key="liq_test_xxx", base_url="https://test.lendiq.com")
     # Replace the real transport with our mock
     client._http = httpx.Client(
         transport=transport,
-        base_url="https://test.banklyze.com",
-        headers={"X-API-Key": "bk_test_xxx"},
+        base_url="https://test.lendiq.com",
+        headers={"X-API-Key": "liq_test_xxx"},
     )
     client._responses = responses  # type: ignore[attr-defined]
     return client

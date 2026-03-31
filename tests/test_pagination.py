@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from banklyze.types.deal import DealSummary
+from lendiq.types.deal import DealSummary
 from tests.conftest import SAMPLE_DEAL, make_response
 
 
@@ -61,8 +61,8 @@ def test_multi_page(mock_client):
     transport = httpx.MockTransport(handler)
     mock_client._http = httpx.Client(
         transport=transport,
-        base_url="https://test.banklyze.com",
-        headers={"X-API-Key": "bk_test_xxx"},
+        base_url="https://test.lendiq.com",
+        headers={"X-API-Key": "liq_test_xxx"},
     )
 
     items = list(mock_client.deals.list_all())
@@ -103,8 +103,8 @@ def test_stops_at_total_pages(mock_client):
     transport = httpx.MockTransport(handler)
     mock_client._http = httpx.Client(
         transport=transport,
-        base_url="https://test.banklyze.com",
-        headers={"X-API-Key": "bk_test_xxx"},
+        base_url="https://test.lendiq.com",
+        headers={"X-API-Key": "liq_test_xxx"},
     )
 
     items = list(mock_client.deals.list_all())
@@ -130,7 +130,7 @@ def test_typed_iteration(mock_client):
 
 def test_untyped_iteration(mock_client):
     """Without model, PageIterator yields raw dicts."""
-    from banklyze.pagination import PageIterator
+    from lendiq.pagination import PageIterator
 
     mock_client._responses["GET /v1/deals"] = make_response(
         200,

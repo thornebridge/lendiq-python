@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from banklyze.exceptions import (
+from lendiq.exceptions import (
     AuthenticationError,
-    BanklyzeError,
+    LendIQError,
     NotFoundError,
     RateLimitError,
     ValidationError,
@@ -64,12 +64,12 @@ def test_429_raises_rate_limit_error(mock_client):
     assert exc_info.value.retry_after == 30
 
 
-def test_500_raises_banklyze_error(mock_client):
+def test_500_raises_lendiq_error(mock_client):
     mock_client._responses["GET /v1/deals"] = make_response(
         500, {"error": "Internal server error"}
     )
 
-    with pytest.raises(BanklyzeError) as exc_info:
+    with pytest.raises(LendIQError) as exc_info:
         mock_client.deals.list()
 
     assert exc_info.value.status_code == 500
@@ -105,7 +105,7 @@ def test_error_message_from_error_key(mock_client):
         500, {"error": "Something broke"}
     )
 
-    with pytest.raises(BanklyzeError) as exc_info:
+    with pytest.raises(LendIQError) as exc_info:
         mock_client.deals.list()
 
     assert "Something broke" in str(exc_info.value)

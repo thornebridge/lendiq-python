@@ -8,24 +8,24 @@ import time
 import httpx
 import pytest
 
-from banklyze import BanklyzeClient
-from banklyze.exceptions import AuthenticationError, BanklyzeError, RateLimitError, ValidationError
+from lendiq import LendIQClient
+from lendiq.exceptions import AuthenticationError, LendIQError, RateLimitError, ValidationError
 from tests.conftest import SAMPLE_DEAL_LIST, make_response
 
 
 def _make_client(handler, *, max_retries: int = 2, retry_backoff: float = 0.1):
-    """Create a BanklyzeClient with a custom mock transport handler."""
+    """Create a LendIQClient with a custom mock transport handler."""
     transport = httpx.MockTransport(handler)
-    client = BanklyzeClient(
-        api_key="bk_test_xxx",
-        base_url="https://test.banklyze.com",
+    client = LendIQClient(
+        api_key="liq_test_xxx",
+        base_url="https://test.lendiq.com",
         max_retries=max_retries,
         retry_backoff=retry_backoff,
     )
     client._http = httpx.Client(
         transport=transport,
-        base_url="https://test.banklyze.com",
-        headers={"X-API-Key": "bk_test_xxx"},
+        base_url="https://test.lendiq.com",
+        headers={"X-API-Key": "liq_test_xxx"},
     )
     return client
 
@@ -73,7 +73,7 @@ def test_retry_500_on_get(monkeypatch):
 
 
 def test_no_retry_post_on_500(monkeypatch):
-    """POST returns 500; exactly 1 call, raises BanklyzeError."""
+    """POST returns 500; exactly 1 call, raises LendIQError."""
     monkeypatch.setattr(time, "sleep", lambda s: None)
     call_log = []
 
@@ -82,7 +82,7 @@ def test_no_retry_post_on_500(monkeypatch):
         return make_response(500, {"error": "Server error"})
 
     client = _make_client(handler)
-    with pytest.raises(BanklyzeError):
+    with pytest.raises(LendIQError):
         client.deals.create(business_name="Test")
 
     assert len(call_log) == 1
